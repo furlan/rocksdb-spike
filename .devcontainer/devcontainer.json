@@ -20,7 +20,7 @@
     // According to the RocksDB-Csharp documentation, libsnappy is required on Linux and Mac.
     // It's the standard compression lib
     // https://github.com/warrenfalk/rocksdb-sharp#requirements
-	"postCreateCommand": "sudo apt-get update && sudo apt install libsnappy-dev",
+	"postCreateCommand": "sudo apt-get update && sudo apt install -y libsnappy-dev",
 
 	// Configure tool-specific properties.
     "customizations": {
