@@ -1,88 +1,64 @@
 ﻿using System.Text;
+using rocksDBcsharp;
 using RocksDbSharp;
 
-Console.WriteLine("RocksDB Simple Example");
+Console.WriteLine("RocksDB Family Tree Example");
 
-// Create or open a RocksDB database
-var options = new DbOptions()
-    .SetCreateIfMissing(true)
-    .SetCompression(Compression.Snappy);
+var family = new FamilyRocks("family");
 
-string dbPath = "my_rocksdb";
+// Add parents
+var john = new Person("John", "Male", "", "");
+var alice = new Person("Alice", "Female", "", "");
+family.AddPerson(john);
+family.AddPerson(alice);
 
-using var db = RocksDb.Open(options, dbPath);
+// Update John's spouse
+john = family.GetPerson("John");
+john.spouse = "Alice";
+family.SetPerson(john);
 
-Console.WriteLine("Database opened successfully!");
+// Add children of John and Alice
+var david = new Person("David", "Male", "John", "");
+var joe = new Person("Joe", "Male", "John", "");
+family.AddPerson(david);
+family.AddPerson(joe);
 
-// Put some key-value pairs
-Console.WriteLine("\n--- Storing data ---");
-db.Put("name", "John Doe");
-db.Put("age", "30");
-db.Put("city", "New York");
-db.Put("occupation", "Software Engineer");
+//Add David's wife
+var sarah = new Person("Sarah", "Female", "", "David");
+family.AddPerson(sarah);
+david.spouse = "Sarah";
+family.SetPerson(david);
 
-Console.WriteLine("Data stored successfully!");
+// Add David and Sarah's child
+var michael = new Person("Michael", "Male", "David", "");
 
-// Get values by keys
-Console.WriteLine("\n--- Retrieving data ---");
-string name = db.Get("name");
-string age = db.Get("age");
-string city = db.Get("city");
-string occupation = db.Get("occupation");
+// View Family Tree
+family.ShowAll();
 
-Console.WriteLine($"Name: {name}");
-Console.WriteLine($"Age: {age}");
-Console.WriteLine($"City: {city}");
-Console.WriteLine($"Occupation: {occupation}");
-
-// Check if a key exists
-Console.WriteLine("\n--- Key existence check ---");
-string nonExistentKey = db.Get("salary");
-Console.WriteLine($"Salary (non-existent): {(nonExistentKey ?? "Key not found")}");
-
-// Iterate through all key-value pairs
-Console.WriteLine("\n--- All stored data ---");
-using var iterator = db.NewIterator();
-iterator.SeekToFirst();
-
-while (iterator.Valid())
+// Simple queries
+var males = family.FindAllMales();
+Console.WriteLine("\n--- All Males ---");
+foreach (var male in males)
 {
-    string key = Encoding.UTF8.GetString(iterator.Key());
-    string value = Encoding.UTF8.GetString(iterator.Value());
-    Console.WriteLine($"{key}: {value}");
-    iterator.Next();
+    Console.WriteLine($"Name: {male}");
 }
 
-// Delete a key
-Console.WriteLine("\n--- Deleting data ---");
-db.Remove("age");
-Console.WriteLine("Age key deleted");
+var johnChildren = family.FindAllChildren("John");
+Console.WriteLine("\n--- John's children ---");
+foreach (var child in johnChildren)
+{
+    Console.WriteLine($"Child name: {child}");
+}
 
-// Try to get deleted key
-string deletedAge = db.Get("age");
-Console.WriteLine($"Age after deletion: {(deletedAge ?? "Key not found")}");
-
-// Batch operations
-Console.WriteLine("\n--- Batch operations ---");
-using var batch = new WriteBatch();
-batch.Put("batch_key1", "batch_value1");
-batch.Put("batch_key2", "batch_value2");
-batch.Put("batch_key3", "batch_value3");
-db.Write(batch);
-
-Console.WriteLine("Batch operations completed!");
+var davidChildren = family.FindAllChildren("David");
+Console.WriteLine("\n--- David's children ---");
+foreach (var child in davidChildren)
+{
+    Console.WriteLine($"Child name: {child}");
+}
 
 // Display final state
 Console.WriteLine("\n--- Final database state ---");
-using var finalIterator = db.NewIterator();
-finalIterator.SeekToFirst();
-
-while (finalIterator.Valid())
-{
-    string key = Encoding.UTF8.GetString(finalIterator.Key());
-    string value = Encoding.UTF8.GetString(finalIterator.Value());
-    Console.WriteLine($"{key}: {value}");
-    finalIterator.Next();
-}
+family.ShowRawData();
 
 Console.WriteLine("\nRocksDB example completed!");
