@@ -16,7 +16,10 @@ public class FamilyRocks
             .SetCreateIfMissing(true)
             .SetCompression(Compression.Snappy);
 
-        rocksDb = RocksDb.Open(options, dbName);
+        string temp = Path.GetTempPath();
+        string path = Environment.ExpandEnvironmentVariables(Path.Combine(temp, dbName));
+        Console.WriteLine($"RocksDb data path: {path}");
+        rocksDb = RocksDb.Open(options, path);
     }
     public string AddPerson(Person person)
     {
