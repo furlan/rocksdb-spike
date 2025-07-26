@@ -54,4 +54,4 @@ TestResult.xml
 nunit-*.xml
 
 # RocksDB file
-my_rocksdb/
+family_db/
