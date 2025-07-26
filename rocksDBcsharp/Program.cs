@@ -43,9 +43,12 @@ namespace ColumnFamilyExample
 
                 string uno = db.Get("one");
                 string one = db.Get("uno", cf: reverse);
+                Console.WriteLine($"Uno: {uno}, One - reverse: {one}");
                 string nada;
                 nada = db.Get("uno");
+                Console.WriteLine($"nada: {nada}");
                 nada = db.Get("one", cf: reverse);
+                Console.WriteLine($"nada - cf reverse: {nada}");
             }
 
             using (var db = RocksDb.Open(options, path, columnFamilies))
@@ -53,6 +56,7 @@ namespace ColumnFamilyExample
                 db.DropColumnFamily("reverse");
                 var reverse = db.CreateColumnFamily(new ColumnFamilyOptions(), "reverse");
                 var nada = db.Get("uno", cf: reverse);
+                Console.WriteLine($"nada: {nada}");
                 db.Put("red", "rouge", cf: reverse);
             }
 
@@ -60,12 +64,15 @@ namespace ColumnFamilyExample
             {
                 var reverse = db.GetColumnFamily("reverse");
                 var nada = db.Get("uno", cf: reverse);
+                Console.WriteLine($"nada: {nada}");
                 var rouge = db.Get("red", cf: reverse);
+                Console.WriteLine($"rouge: {rouge}");
             }
 
             using (var db = RocksDb.OpenReadOnly(options, path, columnFamilies, false))
             {
                 string uno = db.Get("one");
+                Console.WriteLine($"one: {uno}");
             }
         }
     }
