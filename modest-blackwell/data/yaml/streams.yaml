@@ -1,4 +1,10 @@
 stream:
+  id: NT01.N01
+  name: Nest notification
+  assetId: NT01
+  uom: Text
+
+stream:
   id: NT01.T01
   name: Nest set temperature
   assetId: NT01
@@ -27,6 +33,12 @@ stream:
   name: Nest cooling operation stage 
   assetId: NT01
   uom: Unit
+
+stream:
+  id: NT01.A01
+  name: Nest cooling malfunction alarm
+  assetId: NT01
+  uom: On/Off
 
 stream:
   id: LB01.O01

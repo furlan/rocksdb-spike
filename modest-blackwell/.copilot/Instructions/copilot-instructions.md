@@ -47,6 +47,8 @@ Create the application in two phases. At this point only work on the phase 1.
 
 ## Phase 1 - Web API for Assets Meta Information
 
+✅ **Phase 1 Complete - Web API for Assets Meta Information**
+
 Create a Web App API in Core .NET using C# that provide GET operation for the YAML file. That YAML file contains the assets meta information. Consider the follow data description:
 
 Consider the class diagram in markdown mermaid file: [assets-class-diagram.md](./assets-class-diagram.md)
@@ -64,6 +66,10 @@ File location: <project folder>/data/yaml/assets.yaml
 Description: Defines the attributes of stream. An stream is a measure of utilization of an asset. So, every stream must belongs to an asset. This is just the definition, the values of the measure is in the RocksDB. 
 Type: YAML 
 File location: <project folder>/data/yaml/streams.yaml
+
+## Phase 2 - GraphQL API for the Notifications, Utilizations, and Alarms
+
+Add 
 
 # Project general coding standards
 
