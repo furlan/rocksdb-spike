@@ -1,0 +1,15 @@
+asset:
+  id: NT01
+  name: Nest living room 
+  location: Living room
+  type: thermostat
+  class: automation
+
+asset:
+  id: LB01
+  name: Light bulb living room 1 
+  Location: Living room
+  type: light bulb
+  class: light
+  parent: root
+

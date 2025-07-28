@@ -1,0 +1,42 @@
+stream:
+  id: NT01.T01
+  name: Nest set temperature
+  assetId: NT01
+  uom: F
+
+stream:
+  id: NT01.T02
+  name: Nest environment temperature
+  assetId: NT01
+  uom: F
+
+stream:
+  id: NT01.O01
+  name: Nest cooling operation status 
+  assetId: NT01
+  uom: On/Off
+
+stream:
+  id: NT01.O02
+  name: Nest heating operation status 
+  assetId: NT01
+  uom: On/Off
+
+stream:
+  id: NT01.O03
+  name: Nest cooling operation stage 
+  assetId: NT01
+  uom: Unit
+
+stream:
+  id: LB01.O01
+  name: Light bulb status
+  assetId: LB01
+  uom: On/Off
+
+stream:
+  id: LB02.O02
+  name: Light bulb status
+  assetId: LB02
+  uom: On/Off
+

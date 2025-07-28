@@ -21,29 +21,54 @@ This file provides guidance to Copilot Agent when working with code in this repo
 
 ## Overview
 
-Modest Blackwell is an API, providing access to the automation equipments in a house. It will answer GraphQL queries and the data is stored in a RocksDB database.
+Modest Blackwell is an API, providing access to the automation equipments in a house. The API will use GraphQL language so the user can explore what data is available and only retrieve specific data. At this point, all the data will be available to be queried.
 
 ## Architecture Overview
 
 ### Technology Stack
+
 - **Backend**: .Net Core 9.0 using C#
-- **Data Storage**: RocksDB using C# wrapper RocksDbSharp. 
+- **Data Storage**: 
+    - YAML file with assets meta information
+    - RocksDB using C# wrapper RocksDbSharp. 
 - Use Swagger for manual API testing
 
 ## Project Structure Overview
 
-See `mcp-browser-architecture.md` for detailed component organization. Key locations:
-- `src/` - React frontend with components, hooks, types
-- `src-tauri/src/` - Rust backend with database, MCP process management, and Tauri commands
 - Documentation files in root directory
 
-## 
+## Data Storage for Utilization Data
 
-This application is specifically designed for MCP (Model Context Protocol) server testing and exploration. The app provides a Postman-like interface for MCP server development and testing with dynamic server connection management, tool execution, and request/response history.
+This application uses two different data sources. YAML file is used to store assets meta information, and RocksDB is used to store the utilization, which is the series of data from the sensors and equipments. More details will be provided below.
+
+# Requirements
+
+Create the application in two phases. At this point only work on the phase 1.
+
+## Phase 1 - Web API for Assets Meta Information
+
+Create a Web App API in Core .NET using C# that provide GET operation for the YAML file. That YAML file contains the assets meta information. Consider the follow data description:
+
+Consider the class diagram in markdown mermaid file: [assets-class-diagram.md](./assets-class-diagram.md)
+
+You need to write the proper service in the .NET Core. The service will retrieve the data from the YAML files. Also need to write the API to retrieve the data using GET verb only.
+
+### Asset
+
+Description: Defines the attributes of an asset.
+Type: YAML 
+File location: <project folder>/data/yaml/assets.yaml
+
+### Stream 
+
+Description: Defines the attributes of stream. An stream is a measure of utilization of an asset. So, every stream must belongs to an asset. This is just the definition, the values of the measure is in the RocksDB. 
+Type: YAML 
+File location: <project folder>/data/yaml/streams.yaml
 
 # Project general coding standards
 
 ## Naming Conventions
+- Project name should be ModestBlackwell
 - Use camelCase for variables, functions, and methods
 - Prefix private class members with underscore (_)
 - Use ALL_CAPS for constants
@@ -66,7 +91,7 @@ Avoid code duplication by abstracting common functionality into reusable functio
   Structure code to facilitate unit, integration, and end-to-end testing.
 
 ## Code Structure
-- Follow the standard code structure for .NET C# and Blazor pages.
+- Follow the standard code structure for .NET C#.
 
 ## Development Considerations
 - When using the Terminal to test anything, always redirect stdout and stderr to a file and then read the file. Delete the file after reading it. This ensures that you can see the output of your commands, as there is currently a bug in VSCode. Please cat the file so I can see the output as well.
@@ -74,8 +99,6 @@ Avoid code duplication by abstracting common functionality into reusable functio
 - Ensure that sensitive information is not hardcoded in the codebase
 - When creating new files, consider whether there should be any changes to the `.gitignore` file, especially for logs, temporary files, or build artifacts
 - As you write code, make sure that you update the [README.md](../../README.md), updating any application server commands, description, dependencies, and installation instructions. This file serves as the main documentation for the project and should always reflect the current state of the application.
-- As you write code, make sure that you update the [tools/install.sh](../../tools/install.sh) script, if applicable. This script considers the installation and setup of the application, including environment variables and dependencies.
-- As you write code, make sure that you update the [tools/cleanup.sh](../../tools/cleanup.sh) script, if applicable. This script considers the cleanup of the installation, putting you in a clean state for the next setup of the application.
 
 ## Development validation
 - When testing features, if you need to run the development server, check if it's already running before starting it again
