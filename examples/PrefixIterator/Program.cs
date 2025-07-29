@@ -46,6 +46,7 @@ namespace PrefixExample
                 db.Put("00000002Apple", "", cf: cf);
                 db.Put("00000002Cranberry", "", cf: cf);
                 db.Put("00000002Banana", "", cf: cf);
+                db.Put("10000002Orange", "", cf: cf);
 
                 var readOptions = new ReadOptions();
                 using (var iter = db.NewIterator(readOptions: readOptions, cf: cf))
@@ -53,6 +54,17 @@ namespace PrefixExample
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                     var b = Encoding.UTF8.GetBytes("00000001");
+                    iter.Seek(b);
+                    while (iter.Valid())
+                    {
+                        Console.WriteLine(iter.StringKey());
+                        iter.Next();
+                    }
+                    Console.WriteLine("------"); 
+                    
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    b = Encoding.UTF8.GetBytes("00000001C");
                     iter.Seek(b);
                     while (iter.Valid())
                     {
