@@ -6,9 +6,9 @@
 	"image": "mcr.microsoft.com/devcontainers/dotnet:1-9.0-bookworm",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
-    "features": {
+	"features": {
 		"ghcr.io/devcontainers/features/python:1": {}
-    },
+	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [5000, 5001],
 	// "portsAttributes": {
@@ -18,20 +18,25 @@
 	// }
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-    // According to the RocksDB-Csharp documentation, libsnappy is required on Linux and Mac.
-    // It's the standard compression lib
-    // https://github.com/warrenfalk/rocksdb-sharp#requirements
+	// According to the RocksDB-Csharp documentation, libsnappy is required on Linux and Mac.
+	// It's the standard compression lib
+	// https://github.com/warrenfalk/rocksdb-sharp#requirements
 	"postCreateCommand": "sudo apt-get update && sudo apt install -y libsnappy-dev",
 
+	// Set ASP.NET Core environment to Development
+	"containerEnv": {
+		"ASPNETCORE_ENVIRONMENT": "Development"
+	},
+
 	// Configure tool-specific properties.
-    "customizations": {
-            "name": "C# Dev Container",
-            "extensions": [
-                    "ms-dotnettools.csharp",
-                    "ms-dotnettools.csdevkit",
-                    "ms-toolsai.jupyter"
-            ]
-    }
+	"customizations": {
+			"name": "C# Dev Container",
+			"extensions": [
+					"ms-dotnettools.csharp",
+					"ms-dotnettools.csdevkit",
+					"ms-toolsai.jupyter"
+			]
+	}
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
