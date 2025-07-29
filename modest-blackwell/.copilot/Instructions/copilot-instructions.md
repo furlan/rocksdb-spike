@@ -69,7 +69,7 @@ File location: <project folder>/data/yaml/streams.yaml
 
 ## Phase 2 - GraphQL API for the Notifications, Utilizations, and Alarms
 
-Add 
+Add GraphQL API language to access data on RocksDB.
 
 # Project general coding standards
 
