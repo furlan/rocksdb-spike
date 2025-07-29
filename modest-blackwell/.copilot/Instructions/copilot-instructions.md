@@ -67,9 +67,9 @@ Description: Defines the attributes of stream. An stream is a measure of utiliza
 Type: YAML 
 File location: <project folder>/data/yaml/streams.yaml
 
-## Phase 1a - Swagger support
+## Phase 2 - GraphQL API for the Notifications, Utilizations, and Alarms
 
-It's to complement the phase 1. Create the Swagger support for the APIs endpoints already in place.
+In the phase 2, implement the GraphQL API to access the operational data in RocksDB. It will work like a wrapper around the RocksDbSharp implementation.
 
 # Project general coding standards
 
