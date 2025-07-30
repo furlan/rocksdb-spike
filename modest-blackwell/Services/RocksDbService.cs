@@ -109,7 +109,7 @@ public class RocksDbService : IRocksDbService, IDisposable
                 }
 
                 var results = new List<OperationalDataValue>();
-                var keyPrefix = $"{assetId}.{streamId}";
+                var keyPrefix = $"{assetId}{streamId}";
                 
                 // Use iterator to scan for keys with the specified prefix
                 using var iterator = _db.NewIterator(columnFamily);
