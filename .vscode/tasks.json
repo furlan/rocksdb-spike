@@ -7,11 +7,23 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/curiosity.sln",
+                "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+                "/consoleloggerparameters:NoSummary"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
         },
         {
             "label": "publish",
@@ -19,11 +31,12 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/curiosity.sln",
+                "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+                "/consoleloggerparameters:NoSummary"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "group": "build"
         },
         {
             "label": "watch",
@@ -33,29 +46,64 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/curiosity.sln"
+                "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "isBackground": true,
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "group": "build"
         },
         {
-            "label": "run-modest-blackwell",
+            "label": "clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": "build"
+        },
+        {
+            "label": "restore",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "restore",
+                "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": "build"
+        },
+        {
+            "label": "run-debug",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "run",
                 "--project",
-                "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj"
+                "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj",
+                "--configuration",
+                "Debug"
             ],
-            "group": "build",
-            "isBackground": true,
             "problemMatcher": "$msCompile",
+            "group": "test",
+            "dependsOn": "build",
             "presentation": {
                 "echo": true,
                 "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
+                "focus": true,
+                "panel": "new"
+            },
+            "options": {
+                "env": {
+                    "ASPNETCORE_ENVIRONMENT": "Development"
+                }
             }
         }
     ]

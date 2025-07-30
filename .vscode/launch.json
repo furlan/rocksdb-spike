@@ -4,22 +4,32 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
-            "name": ".NET Core Launch (console)",
-            "type": "coreclr",
+            "name": "C#: ModestBlackwell Debug",
+            "type": "dotnet",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/rocksDBcsharp/bin/Debug/net9.0/rocksDBcsharp.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/rocksDBcsharp",
-            "console": "internalConsole",
-            "stopAtEntry": false
+            "projectPath": "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj",
+            "preLaunchTask": "run-debug"
         },
         {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach"
+            "name": "C#: ModestBlackwell Debug (No Build)",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj"
+        },
+        {
+            "name": "C#: ModestBlackwell Development Debug",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj",
+            "preLaunchTask": "build"
+        },
+        {
+            "name": "C#: ModestBlackwell Watch Debug",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj",
+            "preLaunchTask": "watch"
         }
     ]
 }
