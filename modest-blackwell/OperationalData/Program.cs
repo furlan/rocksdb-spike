@@ -12,7 +12,35 @@ namespace OperationalData
     {
         static void Main(string[] args)
         {
-            string path = Environment.ExpandEnvironmentVariables(System.IO.Path.Combine("./data/rocksdb", "operational"));
+            var db = SeedSampleData(System.IO.Path.Combine("../data/rocksdb", "operational"));
+            ReadAllLines(db, "utilization");
+            ReadAllLines(db, "alarm");
+            ReadAllLines(db, "notification");
+        }
+
+        static void ReadAllLines(RocksDb db, string columnFamilyName)
+        {
+            var cf = db.GetColumnFamily(columnFamilyName);
+            var readOptions = new ReadOptions();
+            using var iterator = db.NewIterator(readOptions: readOptions, cf: cf);
+            iterator.SeekToFirst();
+
+            Console.WriteLine(new string('=', 20));
+            Console.WriteLine($"Key-value for column family '{columnFamilyName}':");
+            Console.WriteLine(new string('-', 20));
+
+            while (iterator.Valid())
+            {
+                string key = Encoding.UTF8.GetString(iterator.Key());
+                string value = db.Get(key, cf: cf);
+                Console.WriteLine($"{key}: {value}");
+                iterator.Next();
+            }
+        }
+
+        static RocksDb SeedSampleData(string dbPath)
+        {
+            string path = Environment.ExpandEnvironmentVariables(dbPath);
 
             var options = new DbOptions()
                 .SetCreateIfMissing(true)
@@ -28,76 +56,74 @@ namespace OperationalData
                 { "utilization", new ColumnFamilyOptions() },
             };
 
+            var db = RocksDb.Open(options, path, columnFamilies);
+
             // Create the Column families
             foreach (var cfName in cfNames)
             {
 
                 // Add operational data
-                using (var db = RocksDb.Open(options, path, columnFamilies))
+                var columnFamily = db.GetColumnFamily(cfName);
+
+                // Load data from file
+                string dataPath = System.IO.Path.Combine("./load", cfName + "-data-load.txt");
+
+                if (File.Exists(dataPath))
                 {
-                    var columnFamily = db.GetColumnFamily(cfName);
+                    Console.WriteLine($"Loading {cfName} data from: {dataPath}");
 
-                    // Load data from file
-                    string dataPath = System.IO.Path.Combine("./load", cfName + "-data-load.txt");
+                    string[] lines = File.ReadAllLines(dataPath);
+                    int loadedCount = 0;
 
-                    if (File.Exists(dataPath))
+                    foreach (string line in lines)
                     {
-                        Console.WriteLine($"Loading {cfName} data from: {dataPath}");
-
-                        string[] lines = File.ReadAllLines(dataPath);
-                        int loadedCount = 0;
-
-                        foreach (string line in lines)
+                        if (!string.IsNullOrWhiteSpace(line))
                         {
-                            if (!string.IsNullOrWhiteSpace(line))
+                            // Parse key and value separated by ":"
+                            string[] parts = line.Split(':', 2); // Split into maximum 2 parts
+
+                            if (parts.Length == 2)
                             {
-                                // Parse key and value separated by ":"
-                                string[] parts = line.Split(':', 2); // Split into maximum 2 parts
+                                string key = parts[0].Trim();
+                                string value = parts[1].Trim();
 
-                                if (parts.Length == 2)
-                                {
-                                    string key = parts[0].Trim();
-                                    string value = parts[1].Trim();
+                                // Put the key-value pair into the column family
+                                db.Put(key, value, cf: columnFamily);
+                                loadedCount++;
 
-                                    // Put the key-value pair into the column family
-                                    db.Put(key, value, cf: columnFamily);
-                                    loadedCount++;
-
-                                    Console.WriteLine($"Loaded: {key} -> {value}, on column family {cfName}");
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"Warning: Invalid line format: {line}");
-                                }
+                                Console.WriteLine($"Loaded: {key} -> {value}, on column family {cfName}");
                             }
-                        }
-
-                        Console.WriteLine($"Successfully loaded {loadedCount} {cfName} records into RocksDB");
-
-                        // Verify data was stored correctly by reading it back
-                        Console.WriteLine("\nVerifying stored data:");
-                        foreach (string line in lines)
-                        {
-                            if (!string.IsNullOrWhiteSpace(line))
+                            else
                             {
-                                string[] parts = line.Split(':', 2);
-                                if (parts.Length == 2)
-                                {
-                                    string key = parts[0].Trim();
-                                    string storedValue = db.Get(key, cf: columnFamily);
-                                    Console.WriteLine($"Verified: {key} = {storedValue}");
-                                }
+                                Console.WriteLine($"Warning: Invalid line format: {line}");
                             }
                         }
                     }
-                    else
+
+                    Console.WriteLine($"Successfully loaded {loadedCount} {cfName} records into RocksDB");
+
+                    // Verify data was stored correctly by reading it back
+                    Console.WriteLine("\nVerifying stored data:");
+                    foreach (string line in lines)
                     {
-                        Console.WriteLine($"Warning: {cfName} data file not found at: {dataPath}");
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            string[] parts = line.Split(':', 2);
+                            if (parts.Length == 2)
+                            {
+                                string key = parts[0].Trim();
+                                string storedValue = db.Get(key, cf: columnFamily);
+                                Console.WriteLine($"Verified: {key} = {storedValue}");
+                            }
+                        }
                     }
                 }
-
+                else
+                {
+                    Console.WriteLine($"Warning: {cfName} data file not found at: {dataPath}");
+                }
             }
-
+            return db;
         }
     }
 }
