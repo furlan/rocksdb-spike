@@ -130,7 +130,7 @@ The GraphQL should be able to answer the following operation and response:
                     "name": "Nest environment temperature",
                     "assetId": "NT01",
                     "uom": "F",
-                    "values": [
+                    "values": [ 
                         {
                             "key": "NT01T0220250725T103258Z", 
                             "value": 75
@@ -158,7 +158,7 @@ The GraphQL should be able to answer the following operation and response:
 
 ### Response data source
 
-The type "asset" came from Asset YAML file, filtered by the fields. For one Asset, there are zero or more Streams, that also came from the YAML file. The operational data is stored in the RocksDB. Every operational type has your onw columan family at the RocksDB. Include the column family when it's getting the value using RocksDBSharp.
+The type "asset" came from Asset YAML file, filtered by the fields. For one Asset, there are zero or more Streams, that also came from the YAML file and filtered by the fields. The operational data is stored in the RocksDB. Every operational type has your onw columan family at the RocksDB. Include the column family when it's getting the value using RocksDBSharp.
 
 Retrieving the information from RocksDB, use the prefix iterator. The prefix for an specific stream is the concatenation of asset ID and stream ID. For example, the prefix for asset ID "NT01" and stream ID "T02" is "NT01T02".
 
