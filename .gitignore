@@ -56,3 +56,4 @@ nunit-*.xml
 # RocksDB file
 family_db/
 modest-blackwell/OperationalData/data
+data/

@@ -32,7 +32,7 @@ builder.Configuration["DataPath"] = System.IO.Path.Combine(builder.Environment.C
 // Register services
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IStreamService, StreamService>();
-builder.Services.AddScoped<IRocksDbService, RocksDbService>();
+builder.Services.AddSingleton<IRocksDbService, RocksDbService>();
 builder.Services.AddScoped<IGraphQLService, GraphQLService>();
 
 // Add GraphQL
@@ -69,18 +69,17 @@ app.MapControllers();
 app.MapGraphQL("/graphql");
 
 // Initialize RocksDB on startup
+var rocksDbService = app.Services.GetRequiredService<IRocksDbService>();
+await rocksDbService.InitializeDatabaseAsync();
+
+// Seed test data for demonstration
 using (var scope = app.Services.CreateScope())
 {
-    var rocksDbService = scope.ServiceProvider.GetRequiredService<IRocksDbService>();
-    await rocksDbService.InitializeDatabaseAsync();
-    
-    // Seed test data for demonstration
-    // Temporarily disabled due to RocksDB native library issues
-    // var dataSeedingService = new DataSeedingService(
-    //     scope.ServiceProvider.GetRequiredService<ILogger<DataSeedingService>>(),
-    //     scope.ServiceProvider.GetRequiredService<IConfiguration>()
-    // );
-    // dataSeedingService.SeedTestData();
+    var dataSeedingService = new DataSeedingService(
+        scope.ServiceProvider.GetRequiredService<ILogger<DataSeedingService>>(),
+        rocksDbService
+    );
+    await dataSeedingService.SeedTestData();
 }
 
 app.Run();

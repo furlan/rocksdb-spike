@@ -31,32 +31,53 @@ public class RocksDbService : IRocksDbService, IDisposable
     /// <summary>
     /// Initializes the RocksDB database with column families
     /// </summary>
-    public async Task InitializeDatabaseAsync()
+    public Task InitializeDatabaseAsync()
     {
         try
         {
-            _logger.LogInformation("Skipping RocksDB initialization due to native library dependency issues");
-            // TODO: Fix native library loading issue
-            // var options = new DbOptions().SetCreateIfMissing(true);
-            // var columnFamilies = new ColumnFamilies
-            // {
-            //     { "default", new ColumnFamilyOptions() },
-            //     { "utilization", new ColumnFamilyOptions() },
-            //     { "alarm", new ColumnFamilyOptions() },
-            //     { "notification", new ColumnFamilyOptions() }
-            // };
+            _logger.LogInformation("Initializing RocksDB at {Path}", _dbPath);
+            
+            Directory.CreateDirectory(_dbPath);
+            
+            // First, try to open the database with just the default column family
+            // to check if it exists and create it if necessary
+            var simpleOptions = new DbOptions().SetCreateIfMissing(true);
+            
+            // Check if the database already exists
+            bool dbExists = Directory.Exists(_dbPath) && Directory.GetFiles(_dbPath).Length > 0;
+            
+            if (!dbExists)
+            {
+                // Create the database with just the default column family first
+                using (var tempDb = RocksDb.Open(simpleOptions, _dbPath))
+                {
+                    _logger.LogInformation("Created new RocksDB database");
+                }
+            }
+            
+            // Now try to open with all column families
+            var options = new DbOptions()
+                .SetCreateIfMissing(true)
+                .SetCreateMissingColumnFamilies(true);
+                
+            var columnFamilies = new ColumnFamilies
+            {
+                { "default", new ColumnFamilyOptions() },
+                { "utilization", new ColumnFamilyOptions() },
+                { "alarm", new ColumnFamilyOptions() },
+                { "notification", new ColumnFamilyOptions() }
+            };
 
-            // var dbPath = Path.Combine(_dbPath, "operational");
-            // _logger.LogInformation("Initializing RocksDB at {Path}", dbPath);
+            _db = RocksDb.Open(options, _dbPath, columnFamilies);
             
-            // Directory.CreateDirectory(dbPath);
-            // _database = RocksDb.Open(options, dbPath, columnFamilies);
+            _columnFamilies["utilization"] = _db.GetColumnFamily("utilization");
+            _columnFamilies["alarm"] = _db.GetColumnFamily("alarm");
+            _columnFamilies["notification"] = _db.GetColumnFamily("notification");
             
-            // _utilizationCf = _database.GetColumnFamily("utilization");
-            // _alarmCf = _database.GetColumnFamily("alarm");
-            // _notificationCf = _database.GetColumnFamily("notification");
+            _initialized = true;
+            _logger.LogInformation("RocksDB initialized successfully");
             
-            // _logger.LogInformation("RocksDB initialized successfully");
+            return Task.CompletedTask;
         }
         catch (Exception ex)
         {
@@ -70,9 +91,65 @@ public class RocksDbService : IRocksDbService, IDisposable
     /// </summary>
     public async Task<IEnumerable<OperationalDataValue>> GetOperationalDataAsync(string assetId, string streamId, OperationalTypeEnum operationalType)
     {
-        // TODO: Implement when RocksDB is working
-        _logger.LogWarning("RocksDB not available - returning empty operational data for asset {AssetId}, stream {StreamId}", assetId, streamId);
-        return new List<OperationalDataValue>();
+        if (!_initialized || _db == null)
+        {
+            _logger.LogWarning("RocksDB not initialized - returning empty operational data for asset {AssetId}, stream {StreamId}", assetId, streamId);
+            return new List<OperationalDataValue>();
+        }
+
+        return await Task.Run(() =>
+        {
+            try
+            {
+                var columnFamilyName = operationalType.ToString().ToLowerInvariant();
+                if (!_columnFamilies.TryGetValue(columnFamilyName, out var columnFamily))
+                {
+                    _logger.LogWarning("Column family {ColumnFamily} not found for operational type {OperationalType}", columnFamilyName, operationalType);
+                    return new List<OperationalDataValue>();
+                }
+
+                var results = new List<OperationalDataValue>();
+                var keyPrefix = $"{assetId}.{streamId}";
+                
+                // Use iterator to scan for keys with the specified prefix
+                using var iterator = _db.NewIterator(columnFamily);
+                var prefixBytes = Encoding.UTF8.GetBytes(keyPrefix);
+                iterator.Seek(prefixBytes);
+                
+                while (iterator.Valid())
+                {
+                    var keyBytes = iterator.Key();
+                    var keyString = Encoding.UTF8.GetString(keyBytes);
+                    
+                    // Check if the key starts with our prefix
+                    if (!keyString.StartsWith(keyPrefix))
+                        break;
+                    
+                    var valueBytes = iterator.Value();
+                    var valueString = Encoding.UTF8.GetString(valueBytes);
+                    
+                    // Parse timestamp from key (assuming format: assetId.streamId.timestamp)
+                    var keyParts = keyString.Split('.');
+                    if (keyParts.Length >= 3)
+                    {
+                        results.Add(new OperationalDataValue
+                        {
+                            Key = keyParts.Length >= 3 ? keyParts[2] : keyString, // Use timestamp part or full key
+                            Value = valueString
+                        });
+                    }
+                    
+                    iterator.Next();
+                }
+                
+                return results.OrderBy(x => x.Key).AsEnumerable();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve operational data for asset {AssetId}, stream {StreamId}", assetId, streamId);
+                return new List<OperationalDataValue>();
+            }
+        });
     }
 
     public void Dispose()
