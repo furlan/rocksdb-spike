@@ -13,29 +13,34 @@ namespace OperationalData
         static void Main(string[] args)
         {
             var db = SeedSampleData(System.IO.Path.Combine("../data/rocksdb", "operational"));
-            ReadAllLines(db, "utilization");
-            ReadAllLines(db, "alarm");
-            ReadAllLines(db, "notification");
+            ReadPrefixLines(db, "utilization", "NT01T02");
         }
 
-        static void ReadAllLines(RocksDb db, string columnFamilyName)
+        static void ReadPrefixLines(RocksDb db, string columnFamilyName, string prefix)
         {
             var cf = db.GetColumnFamily(columnFamilyName);
             var readOptions = new ReadOptions();
             using var iterator = db.NewIterator(readOptions: readOptions, cf: cf);
-            iterator.SeekToFirst();
 
             Console.WriteLine(new string('=', 20));
-            Console.WriteLine($"Key-value for column family '{columnFamilyName}':");
+            Console.WriteLine($"Key-value for column family '{columnFamilyName}' and prefix '{prefix}':");
             Console.WriteLine(new string('-', 20));
 
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            var prefixBytes = Encoding.UTF8.GetBytes(prefix);
+            iterator.Seek(prefixBytes);
             while (iterator.Valid())
             {
-                string key = Encoding.UTF8.GetString(iterator.Key());
+                // string key = Encoding.UTF8.GetString(iterator.Key());
+                string key = iterator.StringKey();
+                if (key[..prefix.Length] != prefix) break;
+
                 string value = db.Get(key, cf: cf);
                 Console.WriteLine($"{key}: {value}");
                 iterator.Next();
             }
+            Console.WriteLine($"---End of prefix {prefix}---");
         }
 
         static RocksDb SeedSampleData(string dbPath)
