@@ -34,4 +34,9 @@ public class Asset
     /// Parent asset identifier (optional)
     /// </summary>
     public string? Parent { get; set; }
+
+    /// <summary>
+    /// Operational type for organizing RocksDB data (e.g., utilization, alarm, notification)
+    /// </summary>
+    public string OperationalType { get; set; } = string.Empty;
 }

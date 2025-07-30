@@ -1,5 +1,6 @@
 using ModestBlackwell.Services;
 using ModestBlackwell.Services.Interfaces;
+using ModestBlackwell.GraphQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,7 @@ builder.Services.AddSwaggerGen(c =>
     
     // Include XML comments for better Swagger documentation
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
     {
         c.IncludeXmlComments(xmlPath);
@@ -26,11 +27,21 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Configure data path
-builder.Configuration["DataPath"] = Path.Combine(builder.Environment.ContentRootPath, "data");
+builder.Configuration["DataPath"] = System.IO.Path.Combine(builder.Environment.ContentRootPath, "data");
 
 // Register services
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IStreamService, StreamService>();
+builder.Services.AddScoped<IRocksDbService, RocksDbService>();
+builder.Services.AddScoped<IGraphQLService, GraphQLService>();
+
+// Add GraphQL
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddProjections()
+    .AddFiltering()
+    .AddSorting();
 
 // Add logging
 builder.Services.AddLogging();
@@ -53,5 +64,23 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Map GraphQL endpoint
+app.MapGraphQL("/graphql");
+
+// Initialize RocksDB on startup
+using (var scope = app.Services.CreateScope())
+{
+    var rocksDbService = scope.ServiceProvider.GetRequiredService<IRocksDbService>();
+    await rocksDbService.InitializeDatabaseAsync();
+    
+    // Seed test data for demonstration
+    // Temporarily disabled due to RocksDB native library issues
+    // var dataSeedingService = new DataSeedingService(
+    //     scope.ServiceProvider.GetRequiredService<ILogger<DataSeedingService>>(),
+    //     scope.ServiceProvider.GetRequiredService<IConfiguration>()
+    // );
+    // dataSeedingService.SeedTestData();
+}
 
 app.Run();

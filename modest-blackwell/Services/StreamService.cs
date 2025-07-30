@@ -17,7 +17,7 @@ public class StreamService : IStreamService
     public StreamService(ILogger<StreamService> logger, IConfiguration configuration)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _yamlFilePath = Path.Combine(
+        _yamlFilePath = System.IO.Path.Combine(
             configuration["DataPath"] ?? "data", 
             "yaml", 
             "streams.yaml"

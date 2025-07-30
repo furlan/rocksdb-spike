@@ -12,7 +12,7 @@ namespace OperationalData
     {
         static void Main(string[] args)
         {
-            string path = Environment.ExpandEnvironmentVariables(Path.Combine("./data/rocksdb", "operational"));
+            string path = Environment.ExpandEnvironmentVariables(System.IO.Path.Combine("./data/rocksdb", "operational"));
 
             var options = new DbOptions()
                 .SetCreateIfMissing(true)
@@ -38,7 +38,7 @@ namespace OperationalData
                     var columnFamily = db.GetColumnFamily(cfName);
 
                     // Load data from file
-                    string dataPath = Path.Combine("./load", cfName + "-data-load.txt");
+                    string dataPath = System.IO.Path.Combine("./load", cfName + "-data-load.txt");
 
                     if (File.Exists(dataPath))
                     {

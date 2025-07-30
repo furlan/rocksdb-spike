@@ -17,7 +17,7 @@ public class AssetService : IAssetService
     public AssetService(ILogger<AssetService> logger, IConfiguration configuration)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _yamlFilePath = Path.Combine(
+        _yamlFilePath = System.IO.Path.Combine(
             configuration["DataPath"] ?? "data", 
             "yaml", 
             "assets.yaml"
@@ -114,7 +114,8 @@ public class AssetService : IAssetService
                         Location = GetStringValue(assetDict, "location") ?? GetStringValue(assetDict, "Location"), // Handle case sensitivity
                         Type = GetStringValue(assetDict, "type"),
                         Class = GetStringValue(assetDict, "class"),
-                        Parent = GetStringValue(assetDict, "parent")
+                        Parent = GetStringValue(assetDict, "parent"),
+                        OperationalType = GetStringValue(assetDict, "operationalType")
                     };
                     
                     assets.Add(asset);

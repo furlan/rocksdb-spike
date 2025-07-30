@@ -5,6 +5,7 @@ asset:
   type: thermostat
   class: automation
   parent: root
+  operationalType: utilization
 
 asset:
   id: LB01
@@ -13,3 +14,4 @@ asset:
   type: light bulb
   class: light
   parent: root
+  operationalType: alarm
