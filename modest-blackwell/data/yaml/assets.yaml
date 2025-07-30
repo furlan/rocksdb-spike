@@ -4,6 +4,7 @@ asset:
   location: Living room
   type: thermostat
   class: automation
+  parent: root
 
 asset:
   id: LB01
@@ -12,4 +13,3 @@ asset:
   type: light bulb
   class: light
   parent: root
-

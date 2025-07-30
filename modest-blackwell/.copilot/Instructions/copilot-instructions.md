@@ -47,6 +47,8 @@ Create the application in two phases. At this point only work on the phase 1.
 
 ## Phase 1 - Web API for Assets Meta Information
 
+✅ **Phase 1 Complete - Web API for Assets Meta Information**
+
 Create a Web App API in Core .NET using C# that provide GET operation for the YAML file. That YAML file contains the assets meta information. Consider the follow data description:
 
 Consider the class diagram in markdown mermaid file: [assets-class-diagram.md](./assets-class-diagram.md)
@@ -64,6 +66,101 @@ File location: <project folder>/data/yaml/assets.yaml
 Description: Defines the attributes of stream. An stream is a measure of utilization of an asset. So, every stream must belongs to an asset. This is just the definition, the values of the measure is in the RocksDB. 
 Type: YAML 
 File location: <project folder>/data/yaml/streams.yaml
+
+## Phase 1a - Add operational type to the Asset
+
+In order to organize RocksDB data, add the field type to the model Asset. It's a string value. Change the web API propertly.
+
+## Phase 2 - GraphQL API for the Operational data
+
+In the phase 2, implement the GraphQL API to access the operational data in RocksDB. It will work like a wrapper around the RocksDbSharp implementation. There are three types of operational data and each one has their own Column Families at RocksDB: notification, utilization, and alarm.
+
+RocksDB data file location: ./data/rocksdb/
+RocksDB database name: operational
+
+### GraphQL Definition
+
+The GraphQL should be able to answer the following operation and response:
+
+**Operation:**
+
+```operation
+{
+    asset
+    {
+        id
+        name
+        location
+        type
+        class
+        type {
+            name
+            streams {
+                id
+                name
+                asset_id
+                uom
+                values {
+                    key
+                    value
+                }
+            }
+        }
+    }
+}
+```
+
+**Example of Response:**
+
+```json
+{
+    "data": {
+        "asset": {
+            "id": "NT01",
+            "name": "Nest living room",
+            "location": "Living room",
+            "type": "thermostat",
+            "class": "automation"
+        },
+        "type": {
+            "name": "utilization",
+            "streams": [
+                {
+                    "id": "NT01.T02",
+                    "name": "Nest environment temperature",
+                    "assetId": "NT01",
+                    "uom": "F",
+                    "values": [ 
+                        {
+                            "key": "NT01T0220250725T103258Z", 
+                            "value": 75
+                        },
+                        {
+                            "key": "NT01T0220250725T112658Z",
+                            "value": 74
+                        },
+                        {
+                            "key": "NT01T0220250725T103258Z",
+                            "value": 73
+                        },
+                        {
+                            "key": "NT01T0220250725T112658Z",
+                            "value": 74
+                        },
+                    ]
+                },
+                ...
+            ]
+        } 
+    }
+}
+```
+
+### Response data source
+
+The type "asset" came from Asset YAML file, filtered by the fields. For one Asset, there are zero or more Streams, that also came from the YAML file and filtered by the fields. The operational data is stored in the RocksDB. Every operational type has your onw columan family at the RocksDB. Include the column family when it's getting the value using RocksDBSharp.
+
+Retrieving the information from RocksDB, use the prefix iterator. The prefix for an specific stream is the concatenation of asset ID and stream ID. For example, the prefix for asset ID "NT01" and stream ID "T02" is "NT01T02".
 
 # Project general coding standards
 
