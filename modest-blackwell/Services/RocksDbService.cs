@@ -62,17 +62,17 @@ public class RocksDbService : IRocksDbService, IDisposable
                 
             var columnFamilies = new ColumnFamilies
             {
-                { "default", new ColumnFamilyOptions() },
-                { "utilization", new ColumnFamilyOptions() },
+                //{ "default", new ColumnFamilyOptions() },
                 { "alarm", new ColumnFamilyOptions() },
-                { "notification", new ColumnFamilyOptions() }
+                { "notification", new ColumnFamilyOptions() },
+                { "utilization", new ColumnFamilyOptions() }
             };
 
             _db = RocksDb.Open(options, _dbPath, columnFamilies);
             
-            _columnFamilies["utilization"] = _db.GetColumnFamily("utilization");
             _columnFamilies["alarm"] = _db.GetColumnFamily("alarm");
             _columnFamilies["notification"] = _db.GetColumnFamily("notification");
+            _columnFamilies["utilization"] = _db.GetColumnFamily("utilization");
             
             _initialized = true;
             _logger.LogInformation("RocksDB initialized successfully");
@@ -112,22 +112,33 @@ public class RocksDbService : IRocksDbService, IDisposable
                 var keyPrefix = $"{assetId}{streamId}";
                 
                 // Use iterator to scan for keys with the specified prefix
-                using var iterator = _db.NewIterator(columnFamily);
+                var readOptions = new ReadOptions();
+                using var iterator = _db.NewIterator(readOptions: readOptions, cf: columnFamily);
                 var prefixBytes = Encoding.UTF8.GetBytes(keyPrefix);
                 iterator.Seek(prefixBytes);
+                var cf = _db.GetColumnFamily("utilization");
+                using var i = _db.NewIterator(readOptions: readOptions, cf: cf);
+                i.SeekToFirst();
+                Console.WriteLine(_db.Get("NT01T0220250725T103258Z", cf:cf));
+
+                while (i.Valid())
+                {
+                    Console.WriteLine(i.StringKey());
+                    i.Next();
+                }
                 
                 while (iterator.Valid())
                 {
                     var keyBytes = iterator.Key();
                     var keyString = Encoding.UTF8.GetString(keyBytes);
-                    
+
                     // Check if the key starts with our prefix
                     if (!keyString.StartsWith(keyPrefix))
                         break;
-                    
+
                     var valueBytes = iterator.Value();
                     var valueString = Encoding.UTF8.GetString(valueBytes);
-                    
+
                     // Parse timestamp from key (assuming format: assetId.streamId.timestamp)
                     var keyParts = keyString.Split('.');
                     if (keyParts.Length >= 3)
@@ -138,7 +149,7 @@ public class RocksDbService : IRocksDbService, IDisposable
                             Value = valueString
                         });
                     }
-                    
+
                     iterator.Next();
                 }
                 

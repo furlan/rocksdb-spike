@@ -10,13 +10,30 @@ namespace OperationalData
 {
     class Program
     {
+        static protected string[] cfNames = new string[] { "alarm", "notification", "utilization" };
+        static protected RocksDb? db;
+
         static void Main(string[] args)
         {
-            var db = SeedSampleData(System.IO.Path.Combine("../data/rocksdb", "operational"));
-            ReadPrefixLines(db, "utilization", "NT01T02");
+            OpenRocksDb(System.IO.Path.Combine("../data/rocksdb", "operational"));
+            bool shouldSeedData = args.Length > 0 && 
+                (args[0].Equals("seed", StringComparison.OrdinalIgnoreCase) || 
+                 args[0].Equals("--seed", StringComparison.OrdinalIgnoreCase) ||
+                 args[0].Equals("-s", StringComparison.OrdinalIgnoreCase));
+            
+            if (shouldSeedData)
+            {
+                Console.WriteLine("Seeding sample data...");
+                SeedSampleData();
+            }
+            else
+            {
+                Console.WriteLine("Skipping seed. Use 'seed', '--seed', or '-s' argument to seed sample data.");
+            }
+            ReadPrefixLines("utilization", "NT01T02");
         }
 
-        static void ReadPrefixLines(RocksDb db, string columnFamilyName, string prefix)
+        static void ReadPrefixLines(string columnFamilyName, string prefix)
         {
             var cf = db.GetColumnFamily(columnFamilyName);
             var readOptions = new ReadOptions();
@@ -43,16 +60,13 @@ namespace OperationalData
             Console.WriteLine($"---End of prefix {prefix}---");
         }
 
-        static RocksDb SeedSampleData(string dbPath)
+        static void OpenRocksDb(string dbPath)
         {
             string path = Environment.ExpandEnvironmentVariables(dbPath);
 
             var options = new DbOptions()
                 .SetCreateIfMissing(true)
                 .SetCreateMissingColumnFamilies(true);
-
-            // Create an array of column family names
-            string[] cfNames = new string[] { "alarm", "notification", "utilization" };
 
             var columnFamilies = new ColumnFamilies
             {
@@ -61,7 +75,11 @@ namespace OperationalData
                 { "utilization", new ColumnFamilyOptions() },
             };
 
-            var db = RocksDb.Open(options, path, columnFamilies);
+            db = RocksDb.Open(options, path, columnFamilies);
+        }
+
+        static void SeedSampleData()
+        {
 
             // Create the Column families
             foreach (var cfName in cfNames)
@@ -128,7 +146,6 @@ namespace OperationalData
                     Console.WriteLine($"Warning: {cfName} data file not found at: {dataPath}");
                 }
             }
-            return db;
         }
     }
 }
