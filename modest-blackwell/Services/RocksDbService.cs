@@ -116,39 +116,35 @@ public class RocksDbService : IRocksDbService, IDisposable
                 using var iterator = _db.NewIterator(readOptions: readOptions, cf: columnFamily);
                 var prefixBytes = Encoding.UTF8.GetBytes(keyPrefix);
                 iterator.Seek(prefixBytes);
-                var cf = _db.GetColumnFamily("utilization");
-                using var i = _db.NewIterator(readOptions: readOptions, cf: cf);
-                i.SeekToFirst();
-                Console.WriteLine(_db.Get("NT01T0220250725T103258Z", cf:cf));
+                // var cf = _db.GetColumnFamily("utilization");
+                // using var i = _db.NewIterator(readOptions: readOptions, cf: cf);
+                // i.SeekToFirst();
+                // Console.WriteLine(_db.Get("NT01T0220250725T103258Z", cf:cf));
 
-                while (i.Valid())
-                {
-                    Console.WriteLine(i.StringKey());
-                    i.Next();
-                }
-                
+                // while (i.Valid())
+                // {
+                //     Console.WriteLine(i.StringKey());
+                //     i.Next();
+                // }
+
+                Console.WriteLine($"Family: {columnFamilyName}, prefix: {keyPrefix}");
                 while (iterator.Valid())
                 {
-                    var keyBytes = iterator.Key();
-                    var keyString = Encoding.UTF8.GetString(keyBytes);
+                    // var keyBytes = iterator.Key();
+                    var keyString = iterator.StringKey();  //Encoding.UTF8.GetString(keyBytes);
 
                     // Check if the key starts with our prefix
                     if (!keyString.StartsWith(keyPrefix))
                         break;
 
-                    var valueBytes = iterator.Value();
-                    var valueString = Encoding.UTF8.GetString(valueBytes);
+                    // var valueBytes = iterator.Value();
+                    var valueString = iterator.StringValue();
 
-                    // Parse timestamp from key (assuming format: assetId.streamId.timestamp)
-                    var keyParts = keyString.Split('.');
-                    if (keyParts.Length >= 3)
-                    {
                         results.Add(new OperationalDataValue
                         {
-                            Key = keyParts.Length >= 3 ? keyParts[2] : keyString, // Use timestamp part or full key
+                            Key = keyString,
                             Value = valueString
                         });
-                    }
 
                     iterator.Next();
                 }

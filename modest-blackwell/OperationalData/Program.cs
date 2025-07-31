@@ -51,10 +51,12 @@ namespace OperationalData
             {
                 // string key = Encoding.UTF8.GetString(iterator.Key());
                 string key = iterator.StringKey();
-                if (key[..prefix.Length] != prefix) break;
+                // if (key[..prefix.Length] != prefix) break;
+                if (!iterator.StringKey().StartsWith(prefix))
+                    break;
 
-                string value = db.Get(key, cf: cf);
-                Console.WriteLine($"{key}: {value}");
+                // string value = db.Get(key, cf: cf);
+                Console.WriteLine($"{key}: {iterator.StringValue()}");
                 iterator.Next();
             }
             Console.WriteLine($"---End of prefix {prefix}---");
