@@ -134,8 +134,8 @@ public class StreamService : IStreamService
                         Id = GetStringValue(streamDict, "id"),
                         Name = GetStringValue(streamDict, "name"),
                         AssetId = GetStringValue(streamDict, "assetId"),
-                        Uom = GetStringValue(streamDict, "uom")
-                    };
+                        Uom = GetStringValue(streamDict, "uom"),
+                        Type = GetStringValue(streamDict, "type")                    };
                     
                     streams.Add(stream);
                 }

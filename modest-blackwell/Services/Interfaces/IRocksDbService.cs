@@ -14,7 +14,7 @@ public interface IRocksDbService
     /// <param name="streamId">Stream identifier</param>
     /// <param name="operationalType">Type of operational data (utilization, alarm, notification)</param>
     /// <returns>Collection of operational data values</returns>
-    Task<IEnumerable<OperationalDataValue>> GetOperationalDataAsync(string assetId, string streamId, OperationalTypeEnum operationalType);
+    Task<IEnumerable<OperationalDataValue>> GetOperationalDataAsync(string assetId, string streamId, string operationalType);
 
     /// <summary>
     /// Initializes the RocksDB database with column families

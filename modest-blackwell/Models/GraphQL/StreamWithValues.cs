@@ -26,6 +26,11 @@ public class StreamWithValues
     public string Uom { get; set; } = string.Empty;
 
     /// <summary>
+    /// Unit of measurement
+    /// </summary>
+    public string Type { get; set; } = string.Empty;
+
+    /// <summary>
     /// Operational data values for this stream
     /// </summary>
     public List<OperationalDataValue> Values { get; set; } = new();

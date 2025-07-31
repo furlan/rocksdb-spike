@@ -24,4 +24,9 @@ public class DataStream
     /// Unit of measurement for the data stream values
     /// </summary>
     public string Uom { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Operational type
+    /// </summary>
+    public string Type { get; set; } = string.Empty;
 }

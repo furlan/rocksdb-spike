@@ -56,7 +56,8 @@ public class GraphQLService : IGraphQLService
                     Id = stream.Id,
                     Name = stream.Name,
                     AssetId = stream.AssetId,
-                    Uom = stream.Uom
+                    Uom = stream.Uom,
+                    Type = stream.Type
                 };
 
                 // Extract stream ID from the full stream ID (e.g., "NT01.T02" -> "T02")
@@ -66,15 +67,15 @@ public class GraphQLService : IGraphQLService
                     var streamId = streamIdParts[1];
                     
                     // Get operational data from RocksDB using the asset's operational type
-                    if (Enum.TryParse<OperationalTypeEnum>(asset.OperationalType, true, out var operationalTypeEnum))
-                    {
+                    // if (Enum.TryParse<OperationalTypeEnum>(asset.OperationalType, true, out var operationalTypeEnum))
+                    // {
                         var operationalData = await _rocksDbService.GetOperationalDataAsync(
                             assetId, 
                             streamId,
-                            operationalTypeEnum
+                            stream.Type
                         );
                         streamWithValues.Values = operationalData.ToList();
-                    }
+                    // }
                 }
 
                 streamsWithValues.Add(streamWithValues);
