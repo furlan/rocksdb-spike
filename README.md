@@ -1,12 +1,23 @@
 # RocksDB Spike
 
-This repository contains experiments and examples for working with RocksDB in C#.
+This repository contains experiments and examples of working with RocksDB in C#.
+
+## Examples
+
+There are some ad-hoc examples, exploring different aspects of the RocksDB usage.
+
+- FamilyTree is a simple program showing Put/Get/Iterator methods.
+    - For the same example in Python, check Jupyter [notebook](./simple_family_tree.ipynb).
+- ColumnFamily is to explore how to use column families functionality.
+- PrefixIterator is to show how to use prefix iterators.
 
 ## Projects
 
-### ModestBlackwell API
+Projects as more extensive example of usage of RocksDB simulating real application.
 
-A .NET Core 9.0 Web API that provides access to automation equipment data in a house. The API uses YAML files for metadata and will eventually use RocksDB for time-series data storage.
+### Modest Blackwell API
+
+A .NET Core 9.0 Web API that provides access to automation equipment data in a house. The API uses YAML files for metadata and uses RocksDB for time-series data storage. The project was generated using Copilot Agent, with some manual corrections. You can check the [Copilot instructions here](./modest-blackwell/.copilot/Instructions/copilot-instructions.md).
 
 #### Features
 
@@ -40,6 +51,7 @@ A .NET Core 9.0 Web API that provides access to automation equipment data in a h
 3. **Access the API**:
    - API Base URL: `http://localhost:8080`
    - Swagger Documentation: `http://localhost:8080` (root URL)
+   - GraphQL Console: `http://localhost:8080/graphql`
 
 #### API Endpoints
 
@@ -63,19 +75,48 @@ The API reads from YAML files located in `data/yaml/`:
 
 ```bash
 # Get all assets
-curl http://localhost:8080/api/assets
+curl -s http://localhost:8080/api/assets | jq .
 
 # Get a specific asset
-curl http://localhost:8080/api/assets/NT01
+curl -s http://localhost:8080/api/assets/NT01 | jq .
 
-# Get all data streams for an asset
-curl http://localhost:8080/api/streams/by-asset/NT01
+# Get all data streams
+curl -s http://localhost:8080/api/streams | jq .
 ```
 
-### Examples
+### GraphQL queries
 
-- **ColumnFamily**: RocksDB column family example
-- **FamilyTree**: Person/family relationship example using RocksDB
+Example of query using GraphQL:
+
+```GraphQL
+{
+    asset(id: "NT01")  {
+       type {
+        name
+        streams {
+            id
+            assetId
+            values {
+                key
+                value
+            }
+        }
+       }
+    }
+}
+```
+
+![GraphQL console example](./graphql-console-example.png)
+
+### Operational Data
+
+The intent of the program `OperationalData` is to seed the RocksDB with operational data. Use the [Excel spreadsheet](./modest-blackwell/OperationalData/load/Operational_poc_data.xlsx) to help generating the lines and paste on [load file](./modest-blackwell/OperationalData/load/alarm-data-load.txt).
+
+```bash
+dotnet run [--seed]
+```
+
+Use 'seed', '--seed', or '-s' argument to seed sample data.
 
 ## Development Environment
 
@@ -84,16 +125,3 @@ This project uses a dev container with:
 - Python support
 - libsnappy-dev (for RocksDB compression)
 - C# dev tools and extensions
-
-## Architecture
-
-The ModestBlackwell API is designed in two phases:
-
-1. **Phase 1** (Current): Web API for assets metadata using YAML files
-2. **Phase 2** (Future): Integration with RocksDB for time-series utilization data storage
-
-The application follows SOLID principles and clean architecture patterns with:
-- Service layer for business logic
-- Interface-based dependency injection
-- Comprehensive error handling and logging
-- Structured configuration management
