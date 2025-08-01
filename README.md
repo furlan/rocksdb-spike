@@ -21,7 +21,7 @@ A .NET Core 9.0 Web API that provides access to automation equipment data in a h
 
 #### Features
 
-- **Assets Management**: CRUD operations for automation assets (thermostats, lights, etc.)
+- **Assets Management**: GET operation for automation assets (thermostats, lights, etc.)
 - **Data Streams Management**: Access to sensor and equipment measurement definitions
 - **RESTful API**: Clean REST endpoints with comprehensive documentation
 - **Swagger Integration**: Interactive API documentation available at the root URL
@@ -70,6 +70,8 @@ The API reads from YAML files located in `data/yaml/`:
 
 - **assets.yaml**: Contains asset metadata (thermostats, lights, etc.)
 - **streams.yaml**: Contains data stream definitions (temperature readings, status indicators, etc.)
+
+[Mermaid diagram showing the relationship between Assets and Streams](./modest-blackwell/.copilot/Instructions/assets-class-diagram.md)
 
 #### Example Usage
 
