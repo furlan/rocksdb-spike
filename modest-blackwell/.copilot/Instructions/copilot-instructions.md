@@ -5,20 +5,6 @@ applyTo: "**"
 
 This file provides guidance to Copilot Agent when working with code in this repository.
 
-## Quick Start for New Sessions
-
-**Before starting any work, read these files in order:**
-
-1. **`pair_programming.md`** - Our workflow process for story-driven development
-2. **`project-plan-{some-extension}.md`** - Current progress and next story to work on  
-3. **`technical-considerations.md`** - Lessons learned and implementation decisions
-4. **`mcp-browser-architecture.md`** - Overall architecture and design decisions
-
-**Key workflow reminders:**
-- Always use the TodoWrite tool to track story progress
-- Follow the exact human verification format from pair_programming.md
-- Update technical_considerations.md with lessons learned after each story
-
 ## Overview
 
 Modest Blackwell is an API, providing access to the automation equipments in a house. The API will use GraphQL language so the user can explore what data is available and only retrieve specific data. At this point, all the data will be available to be queried.
@@ -69,9 +55,13 @@ File location: <project folder>/data/yaml/streams.yaml
 
 ## Phase 1a - Add operational type to the Asset
 
+✅ **Phase 1a Complete - Add operational type to the Asset**
+
 In order to organize RocksDB data, add the field type to the model Asset. It's a string value. Change the web API propertly.
 
 ## Phase 2 - GraphQL API for the Operational data
+
+✅ **Phase 2 - GraphQL API for the Operational data**
 
 In the phase 2, implement the GraphQL API to access the operational data in RocksDB. It will work like a wrapper around the RocksDbSharp implementation. There are three types of operational data and each one has their own Column Families at RocksDB: notification, utilization, and alarm.
 
