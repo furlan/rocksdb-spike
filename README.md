@@ -10,6 +10,7 @@ There are some ad-hoc examples, exploring different aspects of the RocksDB usage
     - For the same example in Python, check Jupyter [notebook](./simple_family_tree.ipynb).
 - ColumnFamily is to explore how to use column families functionality.
 - PrefixIterator is to show how to use prefix iterators.
+- SKChat is a very simple chat using Semantic Kernel with plugins.
 
 ## Projects
 
