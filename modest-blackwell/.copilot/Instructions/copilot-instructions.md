@@ -152,6 +152,32 @@ The type "asset" came from Asset YAML file, filtered by the fields. For one Asse
 
 Retrieving the information from RocksDB, use the prefix iterator. The prefix for an specific stream is the concatenation of asset ID and stream ID. For example, the prefix for asset ID "NT01" and stream ID "T02" is "NT01T02".
 
+## Phase 2a - Add filter by location to operational data GraphQL API
+
+Now it is required to add filters by asset location and operational data type to the GraphQL query.
+
+```
+{
+    asset(location: "Living room")  {
+       type(name: "notification") {
+        name
+        streams {
+            id
+            name
+            uom
+            assetId
+            values {
+                key
+                value
+            }
+        }
+       }
+    }
+}
+```
+
+Update README.md file with new filters documentation.
+
 # Project general coding standards
 
 ## Naming Conventions
