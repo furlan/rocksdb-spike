@@ -1,3 +1,4 @@
+using ModestBlackwell.Models;
 using ModestBlackwell.Models.GraphQL;
 using ModestBlackwell.Services.Interfaces;
 
@@ -28,24 +29,63 @@ public class GraphQLService : IGraphQLService
     /// <summary>
     /// Retrieves asset with operational data
     /// </summary>
-    /// <param name="assetId">Asset identifier</param>
+    /// <param name="assetId">Asset identifier (optional)</param>
+    /// <param name="location">Filter by asset location (optional)</param>
     /// <returns>Asset with operational data</returns>
-    public async Task<AssetWithOperationalData?> GetAssetWithOperationalDataAsync(string assetId)
+    public async Task<AssetWithOperationalData?> GetAssetWithOperationalDataAsync(string? assetId = null, string? location = null)
     {
         try
         {
-            _logger.LogInformation("Retrieving asset with operational data for ID: {AssetId}", assetId);
+            _logger.LogInformation("Retrieving asset with operational data - AssetId: {AssetId}, Location: {Location}", 
+                assetId ?? "null", location ?? "null");
 
-            // Get asset information
-            var asset = await _assetService.GetAssetByIdAsync(assetId);
-            if (asset == null)
+            Asset? asset = null;
+
+            // Get asset based on provided filters
+            if (!string.IsNullOrEmpty(assetId))
             {
-                _logger.LogWarning("Asset with ID '{AssetId}' not found", assetId);
-                return null;
+                asset = await _assetService.GetAssetByIdAsync(assetId);
+                if (asset == null)
+                {
+                    _logger.LogWarning("Asset with ID '{AssetId}' not found", assetId);
+                    return null;
+                }
+
+                // If location filter is also provided, check if asset matches
+                if (!string.IsNullOrEmpty(location) && 
+                    !asset.Location.Equals(location, StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogWarning("Asset '{AssetId}' does not match location filter '{Location}'", assetId, location);
+                    return null;
+                }
+            }
+            else if (!string.IsNullOrEmpty(location))
+            {
+                // Get first asset by location if no specific asset ID provided
+                var assetsByLocation = await _assetService.GetAssetsByLocationAsync(location);
+                asset = assetsByLocation.FirstOrDefault();
+                
+                if (asset == null)
+                {
+                    _logger.LogWarning("No assets found for location '{Location}'", location);
+                    return null;
+                }
+            }
+            else
+            {
+                // If no filters provided, get first available asset
+                var allAssets = await _assetService.GetAllAssetsAsync();
+                asset = allAssets.FirstOrDefault();
+                
+                if (asset == null)
+                {
+                    _logger.LogWarning("No assets found");
+                    return null;
+                }
             }
 
             // Get streams for the asset
-            var streams = await _streamService.GetStreamsByAssetIdAsync(assetId);
+            var streams = await _streamService.GetStreamsByAssetIdAsync(asset.Id);
             var streamsWithValues = new List<StreamWithValues>();
 
             // For each stream, get operational data from RocksDB
@@ -66,16 +106,13 @@ public class GraphQLService : IGraphQLService
                 {
                     var streamId = streamIdParts[1];
                     
-                    // Get operational data from RocksDB using the asset's operational type
-                    // if (Enum.TryParse<OperationalTypeEnum>(asset.OperationalType, true, out var operationalTypeEnum))
-                    // {
-                        var operationalData = await _rocksDbService.GetOperationalDataAsync(
-                            assetId, 
-                            streamId,
-                            stream.Type
-                        );
-                        streamWithValues.Values = operationalData.ToList();
-                    // }
+                    // Get operational data from RocksDB using the stream's type
+                    var operationalData = await _rocksDbService.GetOperationalDataAsync(
+                        asset.Id, 
+                        streamId,
+                        stream.Type
+                    );
+                    streamWithValues.Values = operationalData.ToList();
                 }
 
                 streamsWithValues.Add(streamWithValues);
@@ -91,12 +128,14 @@ public class GraphQLService : IGraphQLService
                 }
             };
 
-            _logger.LogInformation("Successfully retrieved asset with {StreamCount} streams and operational data", streamsWithValues.Count);
+            _logger.LogInformation("Successfully retrieved asset '{AssetId}' with {StreamCount} streams and operational data", 
+                asset.Id, streamsWithValues.Count);
             return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving asset with operational data for ID: {AssetId}", assetId);
+            _logger.LogError(ex, "Error retrieving asset with operational data - AssetId: {AssetId}, Location: {Location}", 
+                assetId ?? "null", location ?? "null");
             throw;
         }
     }

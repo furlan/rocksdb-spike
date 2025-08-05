@@ -11,14 +11,16 @@ public class Query
     /// <summary>
     /// Retrieves asset with operational data
     /// </summary>
-    /// <param name="id">Asset identifier</param>
     /// <param name="graphQLService">GraphQL service</param>
+    /// <param name="id">Asset identifier (optional)</param>
+    /// <param name="location">Filter by asset location (optional)</param>
     /// <returns>Asset with operational data</returns>
     public async Task<AssetWithOperationalData?> GetAssetAsync(
-        string id,
-        [Service] IGraphQLService graphQLService)
+        [Service] IGraphQLService graphQLService,
+        string? id = null,
+        string? location = null)
     {
-        return await graphQLService.GetAssetWithOperationalDataAsync(id);
+        return await graphQLService.GetAssetWithOperationalDataAsync(id, location);
     }
 
     /// <summary>
@@ -26,12 +28,24 @@ public class Query
     /// </summary>
     /// <param name="assetService">Asset service</param>
     /// <param name="graphQLService">GraphQL service</param>
+    /// <param name="location">Filter by asset location (optional)</param>
     /// <returns>Collection of assets with operational data</returns>
     public async Task<IEnumerable<AssetWithOperationalData>> GetAssetsAsync(
         [Service] IAssetService assetService,
-        [Service] IGraphQLService graphQLService)
+        [Service] IGraphQLService graphQLService,
+        string? location = null)
     {
-        var assets = await assetService.GetAllAssetsAsync();
+        IEnumerable<Models.Asset> assets;
+        
+        if (!string.IsNullOrEmpty(location))
+        {
+            assets = await assetService.GetAssetsByLocationAsync(location);
+        }
+        else
+        {
+            assets = await assetService.GetAllAssetsAsync();
+        }
+        
         var results = new List<AssetWithOperationalData>();
 
         foreach (var asset in assets)

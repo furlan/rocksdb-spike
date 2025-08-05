@@ -19,4 +19,11 @@ public interface IAssetService
     /// <param name="id">Asset identifier</param>
     /// <returns>Asset if found, null otherwise</returns>
     Task<Asset?> GetAssetByIdAsync(string id);
+
+    /// <summary>
+    /// Retrieves assets filtered by location
+    /// </summary>
+    /// <param name="location">Location to filter by</param>
+    /// <returns>Collection of assets in the specified location</returns>
+    Task<IEnumerable<Asset>> GetAssetsByLocationAsync(string location);
 }

@@ -14,4 +14,27 @@ public class OperationalType
     /// Streams associated with this operational type
     /// </summary>
     public List<StreamWithValues> Streams { get; set; } = new();
+
+    /// <summary>
+    /// Gets filtered operational type by name
+    /// </summary>
+    /// <param name="name">Optional filter by operational type name</param>
+    /// <returns>Filtered operational type or current instance if no filter</returns>
+    public OperationalType GetType(string? name = null)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return this;
+        }
+
+        // Filter streams by the requested operational type
+        var filteredStreams = Streams.Where(s => 
+            s.Type.Equals(name, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        return new OperationalType
+        {
+            Name = name,
+            Streams = filteredStreams
+        };
+    }
 }

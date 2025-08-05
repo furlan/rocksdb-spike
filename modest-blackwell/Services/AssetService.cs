@@ -84,6 +84,31 @@ public class AssetService : IAssetService
     }
 
     /// <summary>
+    /// Retrieves assets filtered by location
+    /// </summary>
+    /// <param name="location">Location to filter by</param>
+    /// <returns>Collection of assets in the specified location</returns>
+    public async Task<IEnumerable<Asset>> GetAssetsByLocationAsync(string location)
+    {
+        try
+        {
+            var allAssets = await GetAllAssetsAsync();
+            var filteredAssets = allAssets.Where(a => 
+                a.Location.Equals(location, StringComparison.OrdinalIgnoreCase));
+            
+            _logger.LogInformation("Found {Count} assets for location '{Location}'", 
+                filteredAssets.Count(), location);
+                
+            return filteredAssets;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving assets for location '{Location}'", location);
+            throw;
+        }
+    }
+
+    /// <summary>
     /// Parses YAML content to extract assets
     /// </summary>
     /// <param name="yamlContent">Raw YAML content</param>

@@ -92,7 +92,9 @@ curl -s http://localhost:8080/api/streams | jq .
 
 #### GraphQL queries
 
-Example of query using GraphQL:
+The API supports GraphQL queries with filtering capabilities for both asset location and operational data type.
+
+**Basic Query:**
 
 ```GraphQL
 {
@@ -102,6 +104,80 @@ Example of query using GraphQL:
         streams {
             id
             assetId
+            values {
+                key
+                value
+            }
+        }
+       }
+    }
+}
+```
+
+**Filter by Asset Location:**
+
+```GraphQL
+{
+    asset(location: "Living room")  {
+       type {
+        name
+        streams {
+            id
+            name
+            uom
+            assetId
+            values {
+                key
+                value
+            }
+        }
+       }
+    }
+}
+```
+
+**Filter by Operational Data Type:**
+
+```GraphQL
+{
+    asset(location: "Living room")  {
+       type(name: "notification") {
+        name
+        streams {
+            id
+            name
+            uom
+            assetId
+            values {
+                key
+                value
+            }
+        }
+       }
+    }
+}
+```
+
+**Available Operational Data Types:**
+- `utilization` - Sensor readings and equipment measurements
+- `notification` - System notifications and operational notes  
+- `alarm` - Equipment alarms and error conditions
+
+**Query Multiple Assets by Location:**
+
+```GraphQL
+{
+    assets(location: "Living room")  {
+       asset {
+         id
+         name
+         location
+       }
+       type {
+        name
+        streams {
+            id
+            name
             values {
                 key
                 value
