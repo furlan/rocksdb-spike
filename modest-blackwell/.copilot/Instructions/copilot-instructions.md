@@ -154,6 +154,8 @@ Retrieving the information from RocksDB, use the prefix iterator. The prefix for
 
 ## Phase 2a - Add filter by location to operational data GraphQL API
 
+✅ **Phase 2a - Add filter by location to operational data GraphQL API
+
 Now it is required to add filters by asset location and operational data type to the GraphQL query.
 
 ```
