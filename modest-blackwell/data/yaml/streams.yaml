@@ -48,6 +48,55 @@ stream:
   type: alarm
 
 stream:
+  id: NT02.NT1
+  name: Nest notification
+  assetId: NT02
+  uom: Text
+  type: notification
+
+stream:
+  id: NT02.T01
+  name: Nest set temperature
+  assetId: NT02
+  uom: F
+  type: utilization
+
+stream:
+  id: NT02.T02
+  name: Nest environment temperature
+  assetId: NT02
+  uom: F
+  type: utilization
+
+stream:
+  id: NT02.O01
+  name: Nest cooling operation status 
+  assetId: NT02
+  uom: On/Off
+  type: utilization
+
+stream:
+  id: NT02.O02
+  name: Nest heating operation status 
+  assetId: NT02
+  uom: On/Off
+  type: utilization
+
+stream:
+  id: NT02.O03
+  name: Nest cooling operation stage 
+  assetId: NT02
+  uom: Unit
+  type: utilization
+
+stream:
+  id: NT02.A01
+  name: Nest cooling malfunction alarm
+  assetId: NT02
+  uom: On/Off
+  type: alarm
+
+stream:
   id: LB01.O01
   name: Light bulb status
   assetId: LB01

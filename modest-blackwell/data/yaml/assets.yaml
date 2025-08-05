@@ -8,6 +8,15 @@ asset:
   operationalType: utilization
 
 asset:
+  id: NT02
+  name: Nest family room 
+  location: Family room
+  type: thermostat
+  class: automation
+  parent: root
+  operationalType: utilization
+
+asset:
   id: LB01
   name: Light bulb living room 1 
   location: Living room
