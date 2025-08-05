@@ -14,7 +14,10 @@ There are some ad-hoc examples, exploring different aspects of the RocksDB usage
 
 ## Projects
 
-Projects as more extensive example of usage of RocksDB simulating real application.
+Projects as more extensive example of usage of RocksDB simulating real application. Here is the list of projects and the respective details:
+
+- Modest Blackwell API
+- Wise Blackwell Console
 
 ### Modest Blackwell API
 
@@ -87,7 +90,7 @@ curl -s http://localhost:8080/api/assets/NT01 | jq .
 curl -s http://localhost:8080/api/streams | jq .
 ```
 
-### GraphQL queries
+#### GraphQL queries
 
 Example of query using GraphQL:
 
@@ -111,7 +114,7 @@ Example of query using GraphQL:
 
 ![GraphQL console example](./graphql-console-example.png)
 
-### Operational Data
+#### Operational Data
 
 The intent of the program `OperationalData` is to seed the RocksDB with operational data. Use the [Excel spreadsheet](./modest-blackwell/OperationalData/load/Operational_poc_data.xlsx) to help generating the lines and paste on [load file](./modest-blackwell/OperationalData/load/alarm-data-load.txt).
 
@@ -120,6 +123,65 @@ dotnet run [--seed]
 ```
 
 Use 'seed', '--seed', or '-s' argument to seed sample data.
+
+### Wise Blackwell Console
+
+It is a .NET 9.0 Console program that uses Semantic Kernel to orchestrate LLM calls to answer questions in natural language about Assets, Streams, and operational data. It makes calls (REST and GraphQL) to the Modest Blackwell API to retrieve the data, and LLM to format to human reading.
+
+#### Usage Guide
+
+> Note: make sure Modest Blackwell API program is running and responding to port 8080.
+
+```bash
+dotnet run 
+```
+
+```
+User > Hi!
+Wise-Blackwell > Hello! How can I assist you today?
+User > What's the name of the asset NT01?
+Wise-Blackwell > The name of the asset NT01 is "Nest living room."
+User > List all the operational data for Nest living room
+Wise-Blackwell > Here is the operational data for the "Nest living room" asset:
+
+### Utilization Streams
+
+1. **NT01.NT1** (Operation Notes):
+    - `NT01NT120250722T112322Z`: Rush hour scheduled for July 24th, 2025.
+    - `NT01NT120250725T102523Z`: Change filter.
+
+2. **NT01.T01** (Current Temperatures):
+    - `NT01T0120250725T103258Z`: 73°F.
+    - `NT01T0120250725T112658Z`: 74°F.
+
+3. **NT01.T02** (Target Temperatures):
+    - `NT01T0220250725T103258Z`: 75°F.
+    - `NT01T0220250725T112658Z`: 74°F.
+    - `NT01T0220250725T123258Z`: 73°F.
+    - `NT01T0220250725T132658Z`: 74°F.
+
+4. **NT01.O01** (Operating Status - Offline Duration):
+    - Timestamps:
+        - `NT01O0120250725T103258Z`: 0 hours.
+        - `NT01O0120250725T112658Z`: 0 hours.
+        - `NT01O0120250725T123258Z`: 0 hours.
+        - `NT01O0120250725T132658Z`: 0 hours.
+
+5. **NT01.O02** (Device Loop/Activity Status):
+    - Timestamps:
+        - `NT01O0220250725T103258Z`: Active.
+        - `NT01O0220250725T112658Z`: Active.
+        - `NT01O0220250725T123258Z`: Active.
+        - `NT01O0220250725T132658Z`: Inactive.
+
+6. **NT01.O03** (Historical Error Check/Time Further Aggregation if just iterations):
+    - Timestamps:
+      OR-log:
+    any Error responsible being caused beyond aggregation Error followup context).
+
+User > bye
+Wise-Blackwell > Goodbye! If you need assistance again, feel free to reach out. Have a great day! 😊
+```
 
 ## Development Environment
 
