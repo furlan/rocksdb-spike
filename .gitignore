@@ -57,3 +57,6 @@ nunit-*.xml
 family_db/
 modest-blackwell/OperationalData/data
 data/
+
+# VSCode
+.vscode/
