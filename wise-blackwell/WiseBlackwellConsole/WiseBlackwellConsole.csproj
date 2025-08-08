@@ -11,5 +11,6 @@
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.61.0" />
     <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.61.0" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    <EmbeddedResource Include="ModestBlackwellGraphQlPrompt.yaml" />
   </ItemGroup>
 </Project>

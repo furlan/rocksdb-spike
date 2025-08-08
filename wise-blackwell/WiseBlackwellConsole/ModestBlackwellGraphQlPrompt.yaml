@@ -5,10 +5,14 @@ template: |
 
     Based on the the user prompt, you need to craft a GraphQL query to only retrieve the required data. This query will retrieve assets and stream details, and also the operational data as well.
     Only include the fields the user specify in the prompt.
+
+    Operational data types are: alarms, notifications, and utilization. Other words the user can use for "utilization" are "sensors readings", "actual temperature".
+    Other words for assets: "equipments", "thermostats", "light", "switchers".
     
     The operational data is under the type "values". 
     The query must follow the structure below:
 
+    ```
     query {
       asset(location: ) {
         type(name: ) {
@@ -22,23 +26,29 @@ template: |
               key
               value
             }
-            type
           }
-        }
-        asset {
-          class
-          id
-          location
-          name
-          operationalType
-          parent
-          type
         }
       }
     }
+    ```
 
-    For example, consider the following prompt from the user: "List the alarms in the operational data for Nest living room". This is the expected query:
+    Consider following field details. The list level represents the level in the hierachy.
 
+    - asset: asset that represents an equipment. The equipment is filted by location. You need to extract the location from the user prompt.  
+      - type: operational data type. The operational data is filtered by type. Expected values: "alarm", "notifications", "utilization".
+        - name: name of the type of the operational data 
+        - streams: represents one measure element of the asset, for exemple temperature, etc.
+          - id: Stream identification code
+          - name: Stream name
+          - uom: Unit of measure of the stream
+          - assetId: Asset identification that the stream belongs
+          - values: Operational data reading
+            - key: operational data key
+            - value: operational data value
+
+    For example, consider the following prompt from the user: "List the alarms in the operational data for living room". This is the expected query:
+
+    ```
     query {
       asset(location: "Living Room") {
         type(name: "alarm") {
@@ -56,9 +66,13 @@ template: |
         }
       }
     } 
+    ```
 
     After you generate the GraphQL query, you have to get the result using the proper AI and format the result for the user.
-    You must format the query string in only one line, using escape caracter.
+    You must format the query string in only one line, using escape caracters.
+    If the user did not speficy the fields, return all the fields.
+    If the user did not request the operation data, so you don't need to include "values" and all their keys and values.
+    You must strictly follow the query structure passed.
   </message> 
 template_format: handlebars
 description: Get asset, streams, and operational data using the GraphQL query
