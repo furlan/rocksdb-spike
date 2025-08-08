@@ -5,15 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
-            "type": "coreclr",
+            "name": "C#: WiseBlackwellConsole Debug",
+            "type": "dotnet",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/examples/LowLevel/bin/Debug/net9.0/LowLevel.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "stopAtEntry": false,
-            "console": "internalConsole"
+            "projectPath": "${workspaceFolder}/wise-blackwell/WiseBlackwellConsole/WiseBlackwellConsole.csproj",
+            "preLaunchTask": "run-debug-wise"
         },
         {
             "name": "C#: ModestBlackwell Debug",
@@ -34,13 +30,6 @@
             "request": "launch",
             "projectPath": "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj",
             "preLaunchTask": "build"
-        },
-        {
-            "name": "C#: ModestBlackwell Watch Debug",
-            "type": "dotnet",
-            "request": "launch",
-            "projectPath": "${workspaceFolder}/modest-blackwell/ModestBlackwell.csproj",
-            "preLaunchTask": "watch"
         }
     ]
 }
