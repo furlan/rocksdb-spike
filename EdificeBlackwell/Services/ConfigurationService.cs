@@ -34,7 +34,7 @@ public class ConfigurationService
     /// Azure OpenAI model deployment ID
     /// </summary>
     public string AzureOpenAiModelId => 
-        _configuration["AZURE_OPENAI_MODEL_ID"] ?? "gpt-4-0125-Preview";
+        _configuration["AZURE_OPENAI_MODEL_ID"] ?? "gpt-4o_deployment";
 
     /// <summary>
     /// Validate that all required configuration is present
