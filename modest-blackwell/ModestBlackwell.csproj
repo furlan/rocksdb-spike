@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RocksDbSharp" Version="6.2.2" />
     <PackageReference Include="RocksDbNative" Version="6.2.2" />
+    <PackageReference Include="RocksDbSharp" Version="6.2.2" />
     <PackageReference Include="YamlDotNet" Version="16.2.0" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.9.12" />
     <PackageReference Include="HotChocolate.Data" Version="13.9.12" />

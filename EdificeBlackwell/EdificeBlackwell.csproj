@@ -10,7 +10,15 @@
   <ItemGroup>
     <PackageReference Include="GraphQL.Client" Version="6.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.8" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.61.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.47.0-preview" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Prompts\**\*.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

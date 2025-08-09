@@ -1,0 +1,133 @@
+using EdificeBlackwell.Models;
+using EdificeBlackwell.Services;
+
+namespace EdificeBlackwell.Tests;
+
+/// <summary>
+/// Simple test class to verify GraphQL query generation functionality
+/// </summary>
+public class GraphQLQueryServiceTests
+{
+    private readonly GraphQLQueryService _service;
+
+    public GraphQLQueryServiceTests()
+    {
+        _service = new GraphQLQueryService();
+    }
+
+    /// <summary>
+    /// Test query generation with both location and operational data type
+    /// </summary>
+    public void TestQueryWithLocationAndType()
+    {
+        var intent = new QueryIntent
+        {
+            Location = "living room",
+            OperationalDataType = "alarm",
+            IsRelevant = true
+        };
+
+        var query = _service.GenerateQuery(intent);
+        
+        if (!query.Contains("asset(location: \"Living Room\")"))
+            throw new Exception("Query should contain location filter");
+        
+        if (!query.Contains("type(name: \"alarm\")"))
+            throw new Exception("Query should contain type filter");
+
+        Console.WriteLine("✅ Test passed: Query with location and type");
+    }
+
+    /// <summary>
+    /// Test query generation with only operational data type
+    /// </summary>
+    public void TestQueryWithTypeOnly()
+    {
+        var intent = new QueryIntent
+        {
+            Location = null,
+            OperationalDataType = "notification",
+            IsRelevant = true
+        };
+
+        var query = _service.GenerateQuery(intent);
+        
+        if (query.Contains("asset(location:"))
+            throw new Exception("Query should not contain location filter");
+        
+        if (!query.Contains("type(name: \"notification\")"))
+            throw new Exception("Query should contain type filter");
+
+        Console.WriteLine("✅ Test passed: Query with type only");
+    }
+
+    /// <summary>
+    /// Test query generation with only location
+    /// </summary>
+    public void TestQueryWithLocationOnly()
+    {
+        var intent = new QueryIntent
+        {
+            Location = "kitchen",
+            OperationalDataType = null,
+            IsRelevant = true
+        };
+
+        var query = _service.GenerateQuery(intent);
+        
+        if (!query.Contains("asset(location: \"Kitchen\")"))
+            throw new Exception("Query should contain location filter");
+        
+        if (query.Contains("type(name:"))
+            throw new Exception("Query should not contain type filter");
+
+        Console.WriteLine("✅ Test passed: Query with location only");
+    }
+
+    /// <summary>
+    /// Test irrelevant query handling
+    /// </summary>
+    public void TestIrrelevantQuery()
+    {
+        var intent = new QueryIntent
+        {
+            Location = null,
+            OperationalDataType = null,
+            IsRelevant = false
+        };
+
+        var query = _service.GenerateQuery(intent);
+        
+        if (!query.Contains("# Query not relevant"))
+            throw new Exception("Query should indicate it's not relevant");
+
+        Console.WriteLine("✅ Test passed: Irrelevant query handling");
+    }
+
+    /// <summary>
+    /// Run all tests
+    /// </summary>
+    public static void RunAllTests()
+    {
+        Console.WriteLine("Running EdificeBlackwell tests...");
+        Console.WriteLine();
+
+        var tests = new GraphQLQueryServiceTests();
+        
+        try
+        {
+            tests.TestQueryWithLocationAndType();
+            tests.TestQueryWithTypeOnly();
+            tests.TestQueryWithLocationOnly();
+            tests.TestIrrelevantQuery();
+            
+            Console.WriteLine();
+            Console.WriteLine("🎉 All tests passed successfully!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Test failed: {ex.Message}");
+            Environment.Exit(1);
+        }
+    }
+}

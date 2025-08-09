@@ -18,6 +18,7 @@ Projects as more extensive example of usage of RocksDB simulating real applicati
 
 - Modest Blackwell API
 - Wise Blackwell Console
+- Edifice Blackwell Console
 
 ### Modest Blackwell API
 
@@ -258,6 +259,189 @@ Wise-Blackwell > Here is the operational data for the "Nest living room" asset:
 User > bye
 Wise-Blackwell > Goodbye! If you need assistance again, feel free to reach out. Have a great day! 😊
 ```
+
+### Edifice Blackwell Console
+
+A .NET Core 9.0 Console application that serves as an AI assistant for accessing home automation data using natural language. This application understands user intent and generates appropriate GraphQL queries to retrieve operational data from assets.
+
+#### Overview
+
+Edifice Blackwell is currently in **Phase 1** development, focusing on extracting location and operational data type filters from natural language queries and generating corresponding GraphQL queries.
+
+#### Features
+
+- **Natural Language Processing**: Converts user queries into structured intent
+- **GraphQL Query Generation**: Automatically generates GraphQL queries based on extracted intent
+- **Smart Filtering**: Supports filtering by asset location and operational data type
+- **Demo Mode**: Demonstrates functionality without requiring Azure AI credentials
+- **Azure AI Integration**: Uses Azure OpenAI for intent extraction with structured outputs
+
+#### Technology Stack
+
+- **.NET Core 9.0** - Console application framework
+- **Microsoft Semantic Kernel** - AI orchestration and Azure AI integration
+- **Handlebars Templates** - Prompt management in YAML format
+- **Azure OpenAI** - LLM for intent extraction with structured outputs
+- **JSON Structured Outputs** - Deterministic response parsing
+
+#### Supported Operational Data Types
+
+- **`alarm`** - Equipment alarms, alerts, and warning messages
+- **`notification`** - System notifications and informational alerts
+- **`utilization`** - Sensor readings, temperature data, usage information, measurements
+
+#### Supported Locations
+
+Any typical house location such as: living room, kitchen, family room, bedroom, bathroom, garage, etc.
+
+#### Getting Started
+
+**Prerequisites:**
+- .NET Core 9.0 SDK
+- Azure OpenAI API access (for production mode)
+
+**Demo Mode (No API Key Required):**
+```bash
+cd EdificeBlackwell
+dotnet build
+dotnet run demo
+```
+
+**Test Mode (Verify Functionality):**
+```bash
+cd EdificeBlackwell
+dotnet run test
+```
+
+**Production Mode (Requires Azure OpenAI API Key):**
+```bash
+cd EdificeBlackwell
+export AZURE_OPENAI_API_KEY="your-api-key-here"
+dotnet run
+```
+
+#### Configuration
+
+The application uses environment variables for configuration:
+
+- `AZURE_OPENAI_ENDPOINT` (optional) - Azure OpenAI endpoint URL
+  - Default: `https://ff-openai-gpt-4.openai.azure.com/`
+- `AZURE_OPENAI_API_KEY` (required) - Azure OpenAI API key
+- `AZURE_OPENAI_MODEL_ID` (optional) - Azure OpenAI model deployment ID
+  - Default: `gpt-4-0125-Preview`
+
+#### Usage Examples
+
+**Demo Mode Output:**
+```
+=== EdificeBlackwell Demo Mode ===
+Demonstrating GraphQL query generation with sample intents
+
+🔤 User Query: 'List the alarms for living room'
+
+📋 Extracted Intent:
+  Location: living room
+  Operational Data Type: alarm
+  Relevant: True
+  Context: User wants to see alarm data for living room
+
+✅ Generated GraphQL Query:
+----------------------------------------
+query {
+  asset(location: "Living Room") {
+    type(name: "alarm") {
+      name
+      streams {
+        id
+        name
+        uom
+        assetId
+        values {
+          key
+          value
+        }
+      }
+    }
+  }
+}
+----------------------------------------
+```
+
+**Interactive Mode (with Azure AI):**
+```
+Query: Show me temperature sensors in the kitchen
+
+🔤 Processing: 'Show me temperature sensors in the kitchen'
+
+🤖 Analyzing query intent...
+📋 Extracted Intent:
+  Location: kitchen
+  Operational Data Type: utilization
+  Relevant: True
+
+🔍 Generating GraphQL query...
+✅ Generated GraphQL Query:
+----------------------------------------
+query {
+  asset(location: "Kitchen") {
+    type(name: "utilization") {
+      name
+      streams {
+        id
+        name
+        uom
+        assetId
+        values {
+          key
+          value
+        }
+      }
+    }
+  }
+}
+----------------------------------------
+```
+
+#### Architecture
+
+The application follows SOLID principles and uses a clean architecture:
+
+```
+EdificeBlackwell/
+├── Models/              # Data models and structured outputs
+│   └── QueryIntent.cs   # Intent extraction model
+├── Services/            # Business logic services
+│   ├── AiService.cs            # Azure AI integration
+│   ├── GraphQLQueryService.cs  # GraphQL query generation
+│   ├── ConfigurationService.cs # Environment configuration
+│   └── DemoService.cs          # Demo mode functionality
+├── Prompts/             # AI prompt templates
+│   └── ExtractGraphQLIntent.yaml
+└── Program.cs           # Application entry point
+```
+
+#### Prompt Engineering
+
+The application uses a structured YAML prompt template that:
+- Provides clear instructions for intent extraction
+- Includes examples for different query types
+- Enforces JSON structured output format
+- Handles edge cases and irrelevant queries
+
+#### Current Limitations (Phase 1)
+
+- Only supports location and operational data type filtering
+- Ignores other query components not related to these filters
+- Requires Azure OpenAI API key for production use
+- GraphQL queries are generated but not executed (next phase)
+
+#### Future Development
+
+Phase 2 will include:
+- Integration with GraphQL server API
+- Execution of generated queries
+- Real-time data retrieval and display
+- Enhanced query capabilities
 
 ## Development Environment
 
