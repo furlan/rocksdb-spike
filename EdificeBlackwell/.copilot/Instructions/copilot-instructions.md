@@ -32,6 +32,8 @@ Create the application in separated phases. The coming phases instructions will 
 
 ## Phase 1 - GraphQL query filtering by asset location and or type of operational data
 
+✅ **Phase 1 Completed** - GraphQL query filtering by asset location and or type of operational data
+
 Create a Console application in Core .NET using C# that interact with the user. The user will enter the prompt. The application needs to undestand the user intent and generate the appropriated GraphQL query.
 
 For this phase, the application just need to extract the intention, the filters values: asset location and type of the operation.
