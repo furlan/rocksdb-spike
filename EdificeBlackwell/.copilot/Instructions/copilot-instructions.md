@@ -99,6 +99,32 @@ For that phase, the application will ignore anything that it is not related with
 
 Document the application in the README file.
 
+## Phase 2 - Enable to configure operational data type names
+
+In the previous phase, the list of the operational data types was defined and hard coded in the prompt. For the phase 2, the operational data types will be supplied in a YAML file. It means the operational type names could be updated without recompile or rebuild the code.
+
+File location: ./data/operationals.YAML
+
+```YAML
+operational_type:
+    id: 01
+    name: notification
+    
+operational_type:
+    id: 02
+    name: alarm
+    
+operational_type:
+    id: 03
+    name: utilization
+```
+
+So you need to extract the list of operational data form the YAML file and include in the prompt using Semantic Kernel function calling.
+
+The rest of the logic and process will remains the same.
+
+Document the application in the README file.
+
 # Project general coding standards
 
 ## Naming Conventions
