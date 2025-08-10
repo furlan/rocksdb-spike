@@ -266,13 +266,17 @@ A .NET Core 9.0 Console application that serves as an AI assistant for accessing
 
 #### Overview
 
-Edifice Blackwell is currently in **Phase 1** development, focusing on extracting location and operational data type filters from natural language queries and generating corresponding GraphQL queries.
+Edifice Blackwell has completed **Phase 1** and **Phase 2** development:
+- **Phase 1**: Basic intent extraction and GraphQL query generation with hardcoded operational data types
+- **Phase 2**: Configurable operational data types loaded from YAML configuration files
 
 #### Features
 
 - **Natural Language Processing**: Converts user queries into structured intent
 - **GraphQL Query Generation**: Automatically generates GraphQL queries based on extracted intent
 - **Smart Filtering**: Supports filtering by asset location and operational data type
+- **Configurable Operational Types**: Operational data types are loaded from YAML configuration files
+- **Semantic Kernel Function Calling**: Uses SK function calling to dynamically access operational types
 - **Demo Mode**: Demonstrates functionality without requiring Azure AI credentials
 - **Azure AI Integration**: Uses Azure OpenAI for intent extraction with structured outputs
 
@@ -283,12 +287,38 @@ Edifice Blackwell is currently in **Phase 1** development, focusing on extractin
 - **Handlebars Templates** - Prompt management in YAML format
 - **Azure OpenAI** - LLM for intent extraction with structured outputs
 - **JSON Structured Outputs** - Deterministic response parsing
+- **YamlDotNet** - YAML configuration file parsing
 
-#### Supported Operational Data Types
+#### Operational Data Types Configuration
 
-- **`alarm`** - Equipment alarms, alerts, and warning messages
-- **`notification`** - System notifications and informational alerts
-- **`utilization`** - Sensor readings, temperature data, usage information, measurements
+Operational data types are now configured via `./data/operationals.yaml`:
+
+```yaml
+operational_types:
+  - operational_type:
+      id: "01"
+      name: "notification"
+      description: "Messages, informational alerts, and general notifications"
+      synonyms: ["message", "info", "notice", "alert"]
+  
+  - operational_type:
+      id: "02"
+      name: "alarm"
+      description: "Critical alerts, warnings, and emergency notifications"
+      synonyms: ["alert", "warning", "critical", "emergency"]
+  
+  - operational_type:
+      id: "03"
+      name: "utilization"
+      description: "Sensor readings, measurements, temperature data, and usage information"
+      synonyms: ["sensor", "reading", "temperature", "measurement", "usage", "data", "sensors readings", "actual temperature"]
+```
+
+This configuration allows:
+- **Updating operational types without recompilation**
+- **Adding synonyms for better natural language understanding**
+- **Detailed descriptions for AI context**
+- **Extensible structure for future enhancements**
 
 #### Supported Locations
 
@@ -408,36 +438,56 @@ The application follows SOLID principles and uses a clean architecture:
 
 ```
 EdificeBlackwell/
+├── data/                # Configuration files
+│   └── operationals.yaml    # Operational data types configuration
 ├── Models/              # Data models and structured outputs
-│   └── QueryIntent.cs   # Intent extraction model
+│   ├── QueryIntent.cs       # Intent extraction model
+│   └── OperationalType.cs   # Operational type configuration model
 ├── Services/            # Business logic services
-│   ├── AiService.cs            # Azure AI integration
-│   ├── GraphQLQueryService.cs  # GraphQL query generation
-│   ├── ConfigurationService.cs # Environment configuration
-│   └── DemoService.cs          # Demo mode functionality
+│   ├── AiService.cs                # Azure AI integration
+│   ├── GraphQLQueryService.cs      # GraphQL query generation
+│   ├── ConfigurationService.cs     # Environment configuration
+│   ├── OperationalDataService.cs   # Operational types management
+│   ├── OperationalDataPlugin.cs    # SK function calling plugin
+│   └── DemoService.cs              # Demo mode functionality
 ├── Prompts/             # AI prompt templates
-│   └── ExtractGraphQLIntent.yaml
+│   └── ExtractGraphQLIntent.yaml   # Enhanced with function calling
 └── Program.cs           # Application entry point
 ```
 
+#### Function Calling Integration
+
+Phase 2 introduced Semantic Kernel function calling to dynamically access operational types:
+
+- **`GetOperationalTypes`**: Retrieves available operational types with descriptions and synonyms
+- **`FindOperationalType`**: Maps user input to correct operational type names
+- **Dynamic prompt enhancement**: Operational types are injected into prompts at runtime
+
 #### Prompt Engineering
 
-The application uses a structured YAML prompt template that:
-- Provides clear instructions for intent extraction
-- Includes examples for different query types
-- Enforces JSON structured output format
-- Handles edge cases and irrelevant queries
+The enhanced prompt template now:
+- Uses function calling to get current operational types
+- Dynamically adapts to configuration changes
+- Provides better synonym matching
+- Maintains structured JSON output format
 
-#### Current Limitations (Phase 1)
+#### Current Capabilities (Phase 1 & 2 Complete)
 
-- Only supports location and operational data type filtering
-- Ignores other query components not related to these filters
-- Requires Azure OpenAI API key for production use
+- ✅ Location and operational data type filtering
+- ✅ Configurable operational data types via YAML
+- ✅ Semantic Kernel function calling for dynamic configuration
+- ✅ Natural language synonym mapping
+- ✅ Structured JSON output with intent extraction
+- ✅ Demo and test modes for development
+
+#### Current Limitations
+
 - GraphQL queries are generated but not executed (next phase)
+- Requires Azure OpenAI API key for production use
 
 #### Future Development
 
-Phase 2 will include:
+Phase 3 will include:
 - Integration with GraphQL server API
 - Execution of generated queries
 - Real-time data retrieval and display

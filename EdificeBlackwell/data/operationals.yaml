@@ -1,0 +1,18 @@
+operational_types:
+  - operational_type:
+      id: "01"
+      name: "notification"
+      description: "Messages, informational alerts, and general notifications"
+      synonyms: ["message", "info", "notice", "alert"]
+  
+  - operational_type:
+      id: "02"
+      name: "alarm"
+      description: "Critical alerts, warnings, and emergency notifications"
+      synonyms: ["alert", "warning", "critical", "emergency"]
+  
+  - operational_type:
+      id: "03"
+      name: "utilization"
+      description: "Sensor readings, measurements, temperature data, and usage information"
+      synonyms: ["sensor", "reading", "temperature", "measurement", "usage", "data", "sensors readings", "actual temperature"]

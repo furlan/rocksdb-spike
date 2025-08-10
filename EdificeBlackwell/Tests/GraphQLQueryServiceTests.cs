@@ -105,6 +105,34 @@ public class GraphQLQueryServiceTests
     }
 
     /// <summary>
+    /// Test operational data service functionality
+    /// </summary>
+    public void TestOperationalDataService()
+    {
+        var operationalService = new OperationalDataService();
+        
+        // Test loading operational types
+        var types = operationalService.GetOperationalTypes();
+        if (types.Count != 3)
+            throw new Exception($"Expected 3 operational types, got {types.Count}");
+        
+        // Test synonym lookup
+        var found = operationalService.FindOperationalType("temperature");
+        if (found?.Name != "utilization")
+            throw new Exception("'temperature' should map to 'utilization'");
+        
+        found = operationalService.FindOperationalType("warning");
+        if (found?.Name != "alarm")
+            throw new Exception("'warning' should map to 'alarm'");
+        
+        found = operationalService.FindOperationalType("message");
+        if (found?.Name != "notification")
+            throw new Exception("'message' should map to 'notification'");
+
+        Console.WriteLine("✅ Test passed: Operational data service");
+    }
+
+    /// <summary>
     /// Run all tests
     /// </summary>
     public static void RunAllTests()
@@ -120,6 +148,7 @@ public class GraphQLQueryServiceTests
             tests.TestQueryWithTypeOnly();
             tests.TestQueryWithLocationOnly();
             tests.TestIrrelevantQuery();
+            tests.TestOperationalDataService();
             
             Console.WriteLine();
             Console.WriteLine("🎉 All tests passed successfully!");

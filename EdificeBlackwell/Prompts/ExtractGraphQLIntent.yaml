@@ -7,33 +7,33 @@ template: |
   Analyze the user query and extract the following information:
   
   1. **Location**: Identify any house location mentioned (e.g., living room, kitchen, family room, bedroom, bathroom, garage, etc.)
-  2. **Operational Data Type**: Identify the type of operational data requested:
-     - "alarm" - for alarms, alerts, or warning messages
-     - "notification" - for notifications, messages, or informational alerts  
-     - "utilization" - for sensor readings, actual temperature, usage data, measurements
-  
+  2. **Operational Data Type**: Identify the type of operational data requested from the available types below.
+
+  ## Available Operational Data Types
+  Call the GetOperationalTypes function to get the current list of available operational data types with their descriptions and synonyms.
+
   ## Important Rules
   - If no location is mentioned, set location to null
   - If no operational data type is mentioned, set operationalDataType to null  
-  - For temperature readings, sensor data, usage information, use "utilization"
+  - Use the FindOperationalType function to map user input to the correct operational type name
   - Only focus on location and operational data type - ignore other information
   - Set isRelevant to false if the query is not related to home automation data
   
   ## Examples
   User: "List the alarms for living room"
   - Location: "living room"
-  - OperationalDataType: "alarm"
+  - OperationalDataType: (use FindOperationalType function with "alarms")
   
   User: "Show me the temperature sensors"
   - Location: null
-  - OperationalDataType: "utilization"
+  - OperationalDataType: (use FindOperationalType function with "temperature sensors")
   
   User: "What notifications do I have in the kitchen?"
   - Location: "kitchen"
-  - OperationalDataType: "notification"
+  - OperationalDataType: (use FindOperationalType function with "notifications")
 
   ## User Query
   {{$input}}
 
   ## Response
-  Extract the intent and respond with a JSON object containing the location, operationalDataType, isRelevant, and context fields.
+  First call GetOperationalTypes to understand available types, then use FindOperationalType as needed to map user terms to operational types. Extract the intent and respond with a JSON object containing the location, operationalDataType, isRelevant, and context fields.

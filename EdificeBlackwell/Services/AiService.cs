@@ -3,6 +3,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System.Text.Json;
 using EdificeBlackwell.Models;
+using System.ComponentModel;
 
 namespace EdificeBlackwell.Services;
 
@@ -13,10 +14,14 @@ public class AiService
 {
     private readonly Kernel _kernel;
     private readonly IChatCompletionService _chatService;
+    private readonly OperationalDataService _operationalDataService;
     private const string FUNCTION_NAME = "ExtractGraphQLIntent";
 
     public AiService(string azureOpenAiEndpoint, string azureOpenAiApiKey, string azureOpenAiModelId)
     {
+        // Initialize operational data service
+        _operationalDataService = new OperationalDataService();
+
         // Create kernel with Azure OpenAI configuration
         var builder = Kernel.CreateBuilder()
             .AddAzureOpenAIChatCompletion(
@@ -25,11 +30,15 @@ public class AiService
                 apiKey: azureOpenAiApiKey);
 
         _kernel = builder.Build();
+        
+        // Add the operational data plugin
+        _kernel.Plugins.AddFromObject(new OperationalDataPlugin(_operationalDataService));
+        
         _chatService = _kernel.GetRequiredService<IChatCompletionService>();
     }
 
     /// <summary>
-    /// Extract intent from user query using structured output
+    /// Extract intent from user query using structured output with function calling
     /// </summary>
     public async Task<QueryIntent> ExtractIntentAsync(string userQuery)
     {
@@ -41,18 +50,20 @@ public class AiService
             // Create the prompt
             var prompt = promptTemplate.Replace("{{$input}}", userQuery);
 
-            // Configure execution settings for structured output
+            // Configure execution settings for structured output with function calling
             var executionSettings = new OpenAIPromptExecutionSettings
             {
                 ResponseFormat = "json_object",
                 Temperature = 0.1,
-                MaxTokens = 500
+                MaxTokens = 1000,
+                ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
             };
 
-            // Execute the prompt
+            // Execute the prompt with function calling
             var result = await _chatService.GetChatMessageContentAsync(
                 prompt, 
-                executionSettings);
+                executionSettings,
+                _kernel);
 
             // Parse the JSON response
             var intentJson = result.Content ?? "{}";
